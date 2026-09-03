@@ -1,0 +1,367 @@
+{
+  "generated_at": "2026-09-03T14:48:50+00:00",
+  "ytd_as_of": "2026-09-02",
+  "source": "YCharts v4 API",
+  "benchmarks": [
+    {
+      "name": "S&P 500",
+      "ticker": "SPYM",
+      "dashName": "S&P 500",
+      "ytd": 0.128684
+    },
+    {
+      "name": "Dow",
+      "ticker": "DIA",
+      "dashName": "Dow",
+      "ytd": 0.113658
+    },
+    {
+      "name": "Nasdaq 100",
+      "ticker": "QQQ",
+      "dashName": "Nasdaq 100",
+      "ytd": 0.157244
+    },
+    {
+      "name": "U.S. Bonds",
+      "ticker": "AGG",
+      "dashName": "U.S. Bonds",
+      "ytd": -0.004139
+    },
+    {
+      "name": "U.S. Dollar",
+      "ticker": "UUP",
+      "dashName": "U.S. Dollar",
+      "ytd": 0.042175000000000004
+    },
+    {
+      "name": "Commodities",
+      "ticker": "PDBC",
+      "dashName": "Commodities",
+      "ytd": 0.438491
+    }
+  ],
+  "models": [
+    {
+      "name": "Moderate",
+      "group": "NelsonCorp",
+      "portfolio_id": 552644,
+      "ytd": 0.093387,
+      "prior_day": 0.005454,
+      "holdings": [
+        {
+          "ticker": "VTI",
+          "weight": 0.1575
+        },
+        {
+          "ticker": "DIA",
+          "weight": 0.09335
+        },
+        {
+          "ticker": "QQQM",
+          "weight": 0.09335
+        },
+        {
+          "ticker": "SPYM",
+          "weight": 0.0933
+        },
+        {
+          "ticker": "VEA",
+          "weight": 0.06
+        },
+        {
+          "ticker": "VOO",
+          "weight": 0.06
+        },
+        {
+          "ticker": "SFLR",
+          "weight": 0.06
+        },
+        {
+          "ticker": "IEF",
+          "weight": 0.056678
+        },
+        {
+          "ticker": "TIP",
+          "weight": 0.056661
+        },
+        {
+          "ticker": "USHY",
+          "weight": 0.056661
+        },
+        {
+          "ticker": "SPHB",
+          "weight": 0.048125
+        },
+        {
+          "ticker": "GDX",
+          "weight": 0.048125
+        },
+        {
+          "ticker": "XLK",
+          "weight": 0.048125
+        },
+        {
+          "ticker": "PWV",
+          "weight": 0.048125
+        },
+        {
+          "ticker": "CASH",
+          "weight": 0.02
+        }
+      ]
+    },
+    {
+      "name": "Abs Rtn Moderate",
+      "group": "NelsonCorp",
+      "portfolio_id": 555767,
+      "ytd": 0.075305,
+      "prior_day": 0.0044540000000000005,
+      "holdings": [
+        {
+          "ticker": "SPYM",
+          "weight": 0.1517
+        },
+        {
+          "ticker": "DIA",
+          "weight": 0.15165
+        },
+        {
+          "ticker": "QQQM",
+          "weight": 0.15165
+        },
+        {
+          "ticker": "VEA",
+          "weight": 0.0975
+        },
+        {
+          "ticker": "VOO",
+          "weight": 0.0975
+        },
+        {
+          "ticker": "SFLR",
+          "weight": 0.05
+        },
+        {
+          "ticker": "PDBC",
+          "weight": 0.04
+        },
+        {
+          "ticker": "IEF",
+          "weight": 0.036674
+        },
+        {
+          "ticker": "TIP",
+          "weight": 0.036663
+        },
+        {
+          "ticker": "USHY",
+          "weight": 0.036663
+        },
+        {
+          "ticker": "SPHB",
+          "weight": 0.025
+        },
+        {
+          "ticker": "GDX",
+          "weight": 0.025
+        },
+        {
+          "ticker": "XLK",
+          "weight": 0.025
+        },
+        {
+          "ticker": "PWV",
+          "weight": 0.025
+        },
+        {
+          "ticker": "REZ",
+          "weight": 0.02
+        },
+        {
+          "ticker": "INDS",
+          "weight": 0.02
+        },
+        {
+          "ticker": "CASH",
+          "weight": 0.01
+        }
+      ]
+    },
+    {
+      "name": "Tax Moderate",
+      "group": "NelsonCorp",
+      "portfolio_id": 1146880,
+      "ytd": 0.075687,
+      "prior_day": 0.002751,
+      "holdings": [
+        {
+          "ticker": "VTI",
+          "weight": 0.21
+        },
+        {
+          "ticker": "BOXX",
+          "weight": 0.13
+        },
+        {
+          "ticker": "PTNQ",
+          "weight": 0.12
+        },
+        {
+          "ticker": "OMFL",
+          "weight": 0.09
+        },
+        {
+          "ticker": "PFFV",
+          "weight": 0.09
+        },
+        {
+          "ticker": "PTLC",
+          "weight": 0.08
+        },
+        {
+          "ticker": "SPYM",
+          "weight": 0.0667
+        },
+        {
+          "ticker": "DIA",
+          "weight": 0.06665
+        },
+        {
+          "ticker": "QQQM",
+          "weight": 0.06665
+        },
+        {
+          "ticker": "MEAR",
+          "weight": 0.06
+        },
+        {
+          "ticker": "BIL",
+          "weight": 0.02
+        }
+      ]
+    },
+    {
+      "name": "Aggressive",
+      "group": "NelsonCorp",
+      "portfolio_id": 597223,
+      "ytd": 0.124971,
+      "prior_day": 0.006832,
+      "holdings": [
+        {
+          "ticker": "VTI",
+          "weight": 0.2295
+        },
+        {
+          "ticker": "DIA",
+          "weight": 0.098
+        },
+        {
+          "ticker": "QQQM",
+          "weight": 0.098
+        },
+        {
+          "ticker": "SPYM",
+          "weight": 0.098
+        },
+        {
+          "ticker": "SPHB",
+          "weight": 0.070125
+        },
+        {
+          "ticker": "GDX",
+          "weight": 0.070125
+        },
+        {
+          "ticker": "XLK",
+          "weight": 0.070125
+        },
+        {
+          "ticker": "PWV",
+          "weight": 0.070125
+        },
+        {
+          "ticker": "VEA",
+          "weight": 0.063
+        },
+        {
+          "ticker": "VOO",
+          "weight": 0.063
+        },
+        {
+          "ticker": "SFLR",
+          "weight": 0.06
+        },
+        {
+          "ticker": "CASH",
+          "weight": 0.01
+        }
+      ]
+    },
+    {
+      "name": "All Tactical",
+      "group": "NelsonCorp",
+      "portfolio_id": 1297251,
+      "ytd": 0.055947,
+      "prior_day": 0.004969,
+      "holdings": [
+        {
+          "ticker": "DIA",
+          "weight": 0.1967
+        },
+        {
+          "ticker": "QQQM",
+          "weight": 0.1967
+        },
+        {
+          "ticker": "SPYM",
+          "weight": 0.1966
+        },
+        {
+          "ticker": "SPHB",
+          "weight": 0.15
+        },
+        {
+          "ticker": "VEA",
+          "weight": 0.125
+        },
+        {
+          "ticker": "VOO",
+          "weight": 0.125
+        },
+        {
+          "ticker": "CASH",
+          "weight": 0.01
+        }
+      ]
+    },
+    {
+      "name": "Macro",
+      "group": "NelsonCorp",
+      "portfolio_id": 1729042,
+      "ytd": 0.241361,
+      "prior_day": 0.011992000000000001,
+      "holdings": [
+        {
+          "ticker": "SPHB",
+          "weight": 0.248169
+        },
+        {
+          "ticker": "GDX",
+          "weight": 0.248169
+        },
+        {
+          "ticker": "XLK",
+          "weight": 0.248169
+        },
+        {
+          "ticker": "PWV",
+          "weight": 0.248169
+        },
+        {
+          "ticker": "CASH",
+          "weight": 0.007325
+        }
+      ]
+    }
+  ]
+}
