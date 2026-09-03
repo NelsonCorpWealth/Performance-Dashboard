@@ -297,7 +297,7 @@
 // =================================================================
 
 // ==> PASTE YOUR FINNHUB KEY BETWEEN THE QUOTES ON THE NEXT LINE <==
-const FINNHUB_KEY = 'dacp371r01qkrahiurs0dacp371r01qkrahiursg';
+const FINNHUB_KEY = 'PASTE_YOUR_KEY_HERE';
 const REFRESH_MS = 60000;
 const FETCH_CONCURRENCY = 4;   // 27 tickers/min stays well under the 60/min free cap
 const WEIGHTS_WARN_DAYS = 4;   // routine runs daily; 4 covers a long weekend
@@ -371,8 +371,8 @@ function applyWeights(d) {
   });
 
   document.getElementById('dash-source').textContent =
-    'Daily: live prices, refreshed every minute' +
-    (weightsAsOf ? '  \u00b7  YTD & weights: YCharts, as of ' + fmtDate(weightsAsOf) : '');
+    'Live prices every minute  \u00b7  YTD compounds today\u2019s move onto YCharts\u2019 close' +
+    (weightsAsOf ? ' of ' + fmtDate(weightsAsOf) : '');
 }
 
 // -----------------------------------------------------------------
@@ -476,6 +476,59 @@ async function fetchAllPrices() {
   priceTimer = setInterval(fetchAllPrices, REFRESH_MS);
 }
 
+// Most recent COMPLETED trading day, as YYYY-MM-DD in ET. Before 4pm on a
+// weekday that's the prior weekday; after 4pm it's today. Holidays are not
+// special-cased: on one, Finnhub reports a ~0 move, so compounding is harmless.
+function lastCompletedTradingDay() {
+  const et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const closed = (et.getHours() * 60 + et.getMinutes()) >= 960;   // 4:00pm
+  const d = new Date(et.getFullYear(), et.getMonth(), et.getDate());
+  if (!closed) d.setDate(d.getDate() - 1);
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+// How many completed sessions the base is missing. 0 = current.
+function sessionsBehind() {
+  if (!weightsAsOf) return null;
+  const last = lastCompletedTradingDay();
+  if (weightsAsOf >= last) return 0;
+  let n = 0, d = new Date(weightsAsOf + 'T00:00:00');
+  const end = new Date(last + 'T00:00:00');
+  while (d < end) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) n++; }
+  return n;
+}
+
+// The base is only safely bridgeable by one Finnhub daily move if the
+// session it's missing is TODAY's. A missed session from a prior day is gone.
+function baseIsStale() {
+  const behind = sessionsBehind();
+  if (behind == null || behind === 0) return false;
+  if (behind >= 2) return true;
+  const et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const today = new Date(et.getFullYear(), et.getMonth(), et.getDate()).toISOString().slice(0, 10);
+  return lastCompletedTradingDay() !== today;   // missing session isn't today
+}
+
+// Live YTD = base compounded with today's move - but only when that move
+// isn't already inside the base. Returns { value, mode }:
+//   'live'  market open, base current, compounding intraday move
+//   'est'   after close, base is yesterday, compounding today's close
+//   'base'  base already includes last session and market is closed
+//   'stale' base is 2+ sessions behind - compounding can't fully catch up
+function realtimeYTD(base, daily) {
+  if (typeof base !== 'number') return { value: null, mode: 'none' };
+  const behind = sessionsBehind();
+  if (behind === 0) {
+    return isMarketOpen() && typeof daily === 'number'
+      ? { value: (1 + base) * (1 + daily) - 1, mode: 'live' }
+      : { value: base, mode: 'base' };
+  }
+  if (typeof daily !== 'number') return { value: base, mode: 'base' };
+  const v = (1 + base) * (1 + daily) - 1;
+  return { value: v, mode: baseIsStale() ? 'stale' : (isMarketOpen() ? 'live' : 'est') };
+}
+
 function isMarketOpen() {
   const et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
   const day = et.getDay();
@@ -528,15 +581,15 @@ function renderWeightsWarning() {
   }
   if (!weightsAsOf) {
     el.style.display = 'block';
-    el.innerHTML = '<strong>No date on weights file.</strong> Model weights may not reflect current sleeve allocations.';
+    el.innerHTML = '<strong>No as-of date in data.json.</strong> YTD and weights may be stale.';
     return;
   }
-  const days = Math.floor((new Date() - new Date(weightsAsOf + 'T00:00:00')) / 86400000);
-  if (days <= WEIGHTS_WARN_DAYS) { el.style.display = 'none'; return; }
+  const behind = sessionsBehind();
+  if (!baseIsStale()) { el.style.display = 'none'; return; }
   el.style.display = 'block';
-  el.innerHTML = '<strong>Data is ' + days + ' days old</strong> (as of ' + weightsAsOf +
-    '). If sleeves have rotated since, today\u2019s model returns are computed on outdated weights. ' +
-    'The daily routine may have stopped - check claude.ai/code/routines.';
+  el.innerHTML = '<strong>YTD base is ' + behind + ' trading days behind</strong> (through ' + fmtDate(weightsAsOf) +
+    '). Live compounding only covers one session, so YTD figures are understated. ' +
+    'The daily routine may have stopped \u2014 check claude.ai/code/routines.';
 }
 
 function renderBenchCards() {
@@ -552,7 +605,7 @@ function renderBenchCards() {
       '<div class="card-label">' + b.name + '</div>' +
       '<div class="card-value ' + cc(daily) + '">' + fmt(daily) + '</div>' +
       '<div class="card-type">Daily Return \u00b7 ' + b.ticker + '</div>' +
-      ytdRow(benchYTD[b.name]);
+      ytdRow(benchYTD[b.name], daily);
     row.appendChild(div);
   });
 }
@@ -579,8 +632,8 @@ function renderModelCards() {
       '</div>' +
       '<div class="card-divider"></div>' +
       '<div class="card-row"><span>vs ' + pl + '</span><span class="val ' + cc(vsBench) + '">' + fmt(vsBench) + '</span></div>' +
-      ytdRow(modelYTD[m.name]) +
-      ytdVsRow(modelYTD[m.name], benchYTD[pl], pl) +
+      ytdRow(modelYTD[m.name], daily) +
+      ytdVsRow(modelYTD[m.name], daily, benchYTD[pl], primDaily, pl) +
       (gap
         ? '<div class="card-row"><span style="color:#a07800">\u26a0 Priced</span><span class="val" style="color:#a07800">' +
           (covered * 100).toFixed(0) + '%</span></div>'
@@ -644,11 +697,17 @@ function renderYTDChart() {
   const ctx = document.getElementById('perf-chart-ytd');
   if (!ctx) return;
   const all = [
-    ...BENCHMARKS.map(b => ({ label: b.name, v: benchYTD[b.name], isBench: true })),
-    ...models.map(m => ({ label: m.name, v: modelYTD[m.name], isBench: false }))
+    ...BENCHMARKS.map(b => ({ label: b.name,
+      v: realtimeYTD(benchYTD[b.name], etfPrices[b.ticker] ? etfPrices[b.ticker].daily : null).value, isBench: true })),
+    ...models.map(m => ({ label: m.name,
+      v: realtimeYTD(modelYTD[m.name], calcModelDaily(m).daily).value, isBench: false }))
   ];
   const asof = document.getElementById('ytd-chart-asof');
-  if (asof) asof.textContent = weightsAsOf ? '(through ' + fmtDate(weightsAsOf) + ')' : '';
+  if (asof) {
+    const mode = realtimeYTD(0, 0).mode;
+    asof.textContent = mode === 'live' ? '(live)' : mode === 'est' ? '(through today\u2019s close)'
+      : weightsAsOf ? '(through ' + fmtDate(weightsAsOf) + ')' : '';
+  }
   if (chartYTD) chartYTD.destroy();
   chartYTD = new Chart(ctx, {
     type: 'bar',
@@ -748,15 +807,24 @@ function fmtDate(iso) {
 // YTD is a prior-close figure from YCharts. It is NOT compounded with
 // today's move - that's deliberate. Label carries the date so nobody
 // mistakes it for live.
-function ytdRow(ytd) {
-  if (typeof ytd !== 'number') return '';
-  return '<div class="card-divider"></div>' +
-    '<div class="card-row"><span>YTD' + (weightsAsOf ? ' <span style="opacity:.6">thru ' + fmtDate(weightsAsOf) + '</span>' : '') +
-    '</span><span class="val ' + cc(ytd) + '">' + fmt(ytd) + '</span></div>';
+function ytdLabel(mode) {
+  const thru = weightsAsOf ? fmtDate(weightsAsOf) : '';
+  if (mode === 'live')  return 'YTD <span style="opacity:.6">live</span>';
+  if (mode === 'est')   return 'YTD <span style="opacity:.6">thru today\u2019s close</span>';
+  if (mode === 'stale') return 'YTD <span style="color:#a07800">base ' + thru + ' \u26a0</span>';
+  return 'YTD <span style="opacity:.6">thru ' + thru + '</span>';
 }
-function ytdVsRow(ytd, benchYtd, pl) {
-  if (typeof ytd !== 'number' || typeof benchYtd !== 'number') return '';
-  const d = ytd - benchYtd;
+function ytdRow(base, daily) {
+  const r = realtimeYTD(base, daily);
+  if (r.value == null) return '';
+  return '<div class="card-divider"></div>' +
+    '<div class="card-row"><span>' + ytdLabel(r.mode) + '</span>' +
+    '<span class="val ' + cc(r.value) + '">' + fmt(r.value) + '</span></div>';
+}
+function ytdVsRow(base, daily, benchBase, benchDaily, pl) {
+  const a = realtimeYTD(base, daily), b = realtimeYTD(benchBase, benchDaily);
+  if (a.value == null || b.value == null) return '';
+  const d = a.value - b.value;
   return '<div class="card-row"><span>YTD vs ' + pl + '</span><span class="val ' + cc(d) + '">' + fmt(d) + '</span></div>';
 }
 function fmt(val, dec = 2) {
