@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Performance — NelsonCorp Wealth Management</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -243,7 +244,7 @@
   <div id="dashboard">
     <div class="dash-controls">
       <div class="dash-controls-left">
-        <button class="btn-outline" onclick="fetchAllPrices()">&#8635; Refresh Prices</button>
+        <button class="btn-outline" onclick="fetchAllPrices({manual:true})">&#8635; Refresh Prices</button>
       </div>
       <div class="dash-source" id="dash-source"></div>
     </div>
@@ -296,10 +297,12 @@
 // the file is older than WEIGHTS_WARN_DAYS.
 // =================================================================
 
-// ==> PASTE YOUR FINNHUB KEY BETWEEN THE QUOTES ON THE NEXT LINE <==
-const FINNHUB_KEY = 'dacp371r01qkrahiurs0dacp371r01qkrahiursg';
-const REFRESH_MS = 60000;
-const FETCH_CONCURRENCY = 4;   // 27 tickers/min stays well under the 60/min free cap
+// The Finnhub key lives in config.js (window.FINNHUB_KEY), NOT here, so
+// updating this file never overwrites it. See README.
+const REFRESH_MS = 120000;          // 2 min. 27 tickers -> ~14 calls/min/tab, cap is 60/min
+const MIN_FETCH_GAP_MS = 20000;     // ignore Refresh clicks faster than this
+const RATE_LIMIT_BACKOFF_MS = 150000;
+const FETCH_CONCURRENCY = 3;
 const WEIGHTS_WARN_DAYS = 4;   // routine runs daily; 4 covers a long weekend
 
 const WEIGHTS_CANDIDATES = ['data.json', 'weights.json'];
@@ -385,16 +388,39 @@ function allTickers() {
   return [...s];
 }
 
-async function fetchAllPrices() {
+let lastFetchAt = 0;
+let fetchInFlight = false;
+
+function armTimer(ms) {
+  clearInterval(priceTimer); clearTimeout(priceTimer);
+  priceTimer = setTimeout(fetchAllPrices, ms);
+}
+
+async function fetchAllPrices(opts) {
+  const manual = !!(opts && opts.manual);
   if (!BENCHMARKS.length) return;
 
-  if (!FINNHUB_KEY || FINNHUB_KEY === 'PASTE_YOUR_KEY_HERE') {
+  const key = (typeof window !== 'undefined' && window.FINNHUB_KEY) || '';
+  if (!key || key === 'PASTE_YOUR_KEY_HERE') {
     hideBanner();
-    setStatus('error', 'No API key set');
+    setStatus('error', 'No API key');
     document.getElementById('update-info').textContent =
-      'Set FINNHUB_KEY near the top of index.html';
+      'config.js is missing or FINNHUB_KEY is not set in it';
     return;
   }
+
+  // Don't spend quota on a tab nobody is looking at. Re-check when visible.
+  if (document.hidden && !manual) { armTimer(REFRESH_MS); return; }
+
+  const since = Date.now() - lastFetchAt;
+  if (manual && since < MIN_FETCH_GAP_MS) {
+    document.getElementById('update-info').textContent =
+      'Refreshed ' + Math.round(since / 1000) + 's ago \u2014 wait a moment';
+    return;
+  }
+  if (fetchInFlight) return;
+  fetchInFlight = true;
+  lastFetchAt = Date.now();
 
   setBanner('Fetching live prices...');
   setStatus('loading', 'Fetching prices...');
@@ -404,42 +430,41 @@ async function fetchAllPrices() {
   const failed = [];
   let authFailed = false, rateLimited = false;
 
-  // Small concurrency: much faster than one-at-a-time, still nowhere near
-  // Finnhub's 60 calls/minute free limit.
   const queue = [...tickers];
   async function worker() {
     while (queue.length) {
       const ticker = queue.shift();
       try {
         const res = await fetch('https://finnhub.io/api/v1/quote?symbol=' +
-                                encodeURIComponent(ticker) + '&token=' + FINNHUB_KEY);
+                                encodeURIComponent(ticker) + '&token=' + key);
         if (res.status === 401 || res.status === 403) { authFailed = true; queue.length = 0; return; }
         if (res.status === 429) { rateLimited = true; queue.length = 0; return; }
         if (!res.ok) { failed.push(ticker); continue; }
         const q = await res.json();
-        if (!q || typeof q.c !== 'number' || typeof q.pc !== 'number' || !q.pc) {
-          failed.push(ticker); continue;
-        }
+        if (!q || typeof q.c !== 'number' || typeof q.pc !== 'number' || !q.pc) { failed.push(ticker); continue; }
         newPrices[ticker] = { daily: (q.c - q.pc) / q.pc };
-      } catch (e) {
-        failed.push(ticker);
-      }
+      } catch (e) { failed.push(ticker); }
     }
   }
   await Promise.all(Array.from({ length: FETCH_CONCURRENCY }, worker));
-
+  fetchInFlight = false;
   hideBanner();
 
   if (authFailed) {
     setStatus('error', 'API key rejected');
     document.getElementById('update-info').textContent =
-      'Finnhub rejected the key \u2014 it may have been revoked. Get a new one at finnhub.io and update FINNHUB_KEY in index.html.';
-    return;
+      'Finnhub rejected the key \u2014 it may have been revoked. Get a new one at finnhub.io and update config.js.';
+    return;   // no point retrying
   }
+
   if (rateLimited) {
+    // Keep whatever prices we already had on screen; retry after a backoff.
+    const retryAt = new Date(Date.now() + RATE_LIMIT_BACKOFF_MS).toLocaleTimeString('en-US', { timeStyle: 'short' });
     setStatus('error', 'Rate limited');
     document.getElementById('update-info').textContent =
-      'Finnhub rate limit hit \u2014 too many requests. Wait a minute, or lower FETCH_CONCURRENCY.';
+      'Finnhub rate limit (60/min) hit \u2014 usually several dashboard tabs open. Showing last prices; retrying at ' + retryAt + '.';
+    if (Object.keys(etfPrices).length) renderAll();
+    armTimer(RATE_LIMIT_BACKOFF_MS);
     return;
   }
 
@@ -447,6 +472,7 @@ async function fetchAllPrices() {
   if (fetched === 0) {
     setStatus('error', 'Price fetch failed');
     document.getElementById('update-info').textContent = 'Could not reach Finnhub \u2014 check connection';
+    armTimer(REFRESH_MS);
     return;
   }
 
@@ -464,17 +490,20 @@ async function fetchAllPrices() {
     document.getElementById('update-info').textContent = 'Prior trading day\u2019s close \u00b7 ' + stamp;
   }
 
-  // A missing ticker silently understates a model's return, so say so.
   if (failed.length) {
     console.warn('no quote for:', failed.join(', '));
-    document.getElementById('update-info').textContent +=
-      '  \u00b7  \u26a0 No quote for ' + failed.join(', ');
+    document.getElementById('update-info').textContent += '  \u00b7  \u26a0 No quote for ' + failed.join(', ');
   }
 
   renderAll();
-  clearInterval(priceTimer);
-  priceTimer = setInterval(fetchAllPrices, REFRESH_MS);
+  // Off-hours the numbers don't move; poll gently.
+  armTimer(isMarketOpen() ? REFRESH_MS : REFRESH_MS * 5);
 }
+
+// Coming back to a tab: refresh if the data is old.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() - lastFetchAt > REFRESH_MS) fetchAllPrices();
+});
 
 // Most recent COMPLETED trading day, as YYYY-MM-DD in ET. Before 4pm on a
 // weekday that's the prior weekday; after 4pm it's today. Holidays are not
