@@ -28,32 +28,17 @@
   }
 
   /* ── HEADER ── */
-  .site-header{
-    background:linear-gradient(135deg, #152d22 0%, var(--green-dark) 60%, #22553d 100%);
-    padding:0 48px;display:flex;align-items:center;justify-content:space-between;
-    height:80px;border-bottom:3px solid var(--gold);flex-wrap:wrap;gap:10px;
-    box-shadow:0 2px 12px rgba(0,0,0,0.25);position:relative;z-index:10;
-  }
-  .site-header::after{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(90deg, rgba(201,168,76,0.06) 0%, transparent 60%);
-    pointer-events:none;
-  }
-  .logo-area{display:flex;align-items:center;gap:18px;position:relative;z-index:1}
-  .logo-img{height:46px;object-fit:contain;filter:brightness(0) invert(1)}
-  .logo-divider{width:1px;height:34px;background:rgba(255,255,255,0.18)}
-  .logo-sub{font-size:0.78rem;color:rgba(255,255,255,0.45);letter-spacing:0.14em;text-transform:uppercase;font-weight:600}
-  .header-date{font-size:0.84rem;color:rgba(255,255,255,0.45);position:relative;z-index:1;letter-spacing:0.01em}
-
-  /* ── TITLE BAR ── */
-  .title-bar{
-    background:linear-gradient(135deg, #2a7a5c 0%, var(--green) 50%, #336b55 100%);
-    padding:18px 48px;display:flex;align-items:center;justify-content:space-between;
-    flex-wrap:wrap;gap:12px;border-bottom:1px solid rgba(255,255,255,0.1);
-    box-shadow:0 2px 8px rgba(0,0,0,0.12);
-  }
-  .title-bar h1{font-family:'Merriweather',serif;font-size:1.4rem;font-weight:300;color:rgba(255,255,255,0.95);letter-spacing:0.01em}
-  .title-bar h1 span{color:var(--gold-light);font-weight:700}
+  .hdr{background:var(--green-dark);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:72px;border-bottom:4px solid var(--gold);flex-wrap:wrap;gap:8px;line-height:normal}
+  .hdr-left{display:flex;align-items:center;gap:14px}
+  .logo-img{height:42px;filter:brightness(0) invert(1);object-fit:contain}
+  .hdr-div{width:1px;height:30px;background:rgba(255,255,255,0.18)}
+  .hdr-sub{font-size:0.8rem;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase}
+  .hdr-date{font-size:0.82rem;color:rgba(255,255,255,0.4)}
+  .title-bar{background:var(--green);padding:16px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .title-bar h1{margin:0;font-family:'Merriweather',serif;font-size:1.35rem;font-weight:400;line-height:normal;color:#fff}
+  .title-bar h1 span{color:var(--gold-light)}
+  @media(max-width:768px){.hdr,.title-bar{padding-left:18px;padding-right:18px}}
+  @media(max-width:600px){.hdr{height:auto;padding-top:10px;padding-bottom:10px}.hdr-sub{font-size:0.7rem}.hdr-date{font-size:0.72rem}.title-bar h1{font-size:1.1rem}}
   .title-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .update-info{font-size:0.8rem;color:rgba(255,255,255,0.5)}
   .status-badge{
@@ -230,14 +215,13 @@
 </style>
 </head>
 <body>
-<div class="site-header">
-  <div class="logo-area">
-    <img src="https://nelsoncorp.com/wp-content/uploads/2025/06/NelsonCorp-Logo-2025.png" alt="NelsonCorp" class="logo-img" onerror="this.style.display='none';document.querySelector('.logo-fallback').style.display='block'">
-    <div class="logo-fallback" style="display:none;font-family:'Merriweather',serif;color:#fff;font-size:1.1rem;font-weight:700">NelsonCorp Wealth Management</div>
-    <div class="logo-divider"></div>
-    <div class="logo-sub">Portfolio Analytics</div>
+<div class="hdr">
+  <div class="hdr-left">
+    <img src="https://nelsoncorp.com/wp-content/uploads/2025/06/NelsonCorp-Logo-2025.png" class="logo-img" alt="NelsonCorp" onerror="this.style.display='none'">
+    <div class="hdr-div"></div>
+    <div class="hdr-sub">Portfolio Analytics</div>
   </div>
-  <div class="header-date" id="header-date"></div>
+  <div class="hdr-date" id="hdr-date"></div>
 </div>
 <div class="title-bar">
   <h1>Daily Portfolio <span>Performance Dashboard</span></h1>
@@ -309,7 +293,7 @@ let BENCHMARKS = [], strategies = [], sleeves = [];
 let weightsAsOf = null, benchYTD = {};
 let etfPrices = {}, priceTimer = null, lastFetchAt = 0, fetchInFlight = false;
 
-document.getElementById('header-date').textContent =
+document.getElementById('hdr-date').textContent =
   new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
 function primaryTicker() { return BENCHMARKS.length ? BENCHMARKS[0].ticker : null; }
