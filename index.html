@@ -391,7 +391,15 @@ async function fetchAllPrices(opts) {
   }
 
   // Don't spend quota on a tab nobody is looking at. Re-check when visible.
-  if (document.hidden && !manual) { armTimer(REFRESH_MS); return; }
+  if (document.hidden && !manual) {
+    // Not the visible tab: don't spend quota. Render what we have and say so.
+    hideBanner();
+    setStatus('loading', 'Paused \u2014 tab in background');
+    document.getElementById('update-info').textContent = 'Prices refresh when this tab is visible';
+    if (BENCHMARKS.length) renderAll();
+    armTimer(REFRESH_MS);
+    return;
+  }
 
   const since = Date.now() - lastFetchAt;
   if (manual && since < MIN_FETCH_GAP_MS) {
