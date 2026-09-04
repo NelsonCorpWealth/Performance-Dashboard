@@ -346,12 +346,16 @@ function allTickers() {
 
 // { daily, covered }: covered = fraction of weight we could price. Cash = 0%.
 function calcDaily(m) {
-  let total = 0, covered = 0;
+  let total = 0, covered = 0, nonCash = 0, priced = 0;
   for (const h of m.holdings) {
     if (h.ticker === 'CASH') { covered += h.weight; continue; }
+    nonCash++;
     const p = etfPrices[h.ticker];
-    if (p) { total += h.weight * p.daily; covered += h.weight; }
+    if (p) { total += h.weight * p.daily; covered += h.weight; priced++; }
   }
+  // Nothing but cash could be priced -> we know nothing about today's move.
+  // Return null so cards show a dash and YTD falls back to the base.
+  if (nonCash > 0 && priced === 0) return { daily: null, covered: 0 };
   return { daily: covered > 0 ? total : null, covered };
 }
 
