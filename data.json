@@ -1,43 +1,43 @@
 {
-  "generated_at": "2026-09-03T14:48:50+00:00",
-  "ytd_as_of": "2026-09-02",
-  "source": "YCharts v4 API",
+  "ytd_as_of": "2026-09-03",
+  "generated_at": "2026-09-04T11:07:25+00:00",
+  "source": "YCharts (MCP, cloud routine)",
   "benchmarks": [
     {
       "name": "S&P 500",
       "ticker": "SPYM",
       "dashName": "S&P 500",
-      "ytd": 0.128684
+      "ytd": 0.140463
     },
     {
       "name": "Dow",
       "ticker": "DIA",
       "dashName": "Dow",
-      "ytd": 0.113658
+      "ytd": 0.126901
     },
     {
       "name": "Nasdaq 100",
       "ticker": "QQQ",
       "dashName": "Nasdaq 100",
-      "ytd": 0.157244
+      "ytd": 0.170999
     },
     {
       "name": "U.S. Bonds",
       "ticker": "AGG",
       "dashName": "U.S. Bonds",
-      "ytd": -0.004139
+      "ytd": -0.003008
     },
     {
       "name": "U.S. Dollar",
       "ticker": "UUP",
       "dashName": "U.S. Dollar",
-      "ytd": 0.042175000000000004
+      "ytd": 0.036256
     },
     {
       "name": "Commodities",
       "ticker": "PDBC",
       "dashName": "Commodities",
-      "ytd": 0.438491
+      "ytd": 0.440755
     }
   ],
   "models": [
@@ -45,8 +45,8 @@
       "name": "Moderate",
       "group": "NelsonCorp",
       "portfolio_id": 552644,
-      "ytd": 0.093387,
-      "prior_day": 0.005454,
+      "ytd": 0.105137,
+      "prior_day": 0.010744,
       "holdings": [
         {
           "ticker": "VTI",
@@ -114,8 +114,8 @@
       "name": "Abs Rtn Moderate",
       "group": "NelsonCorp",
       "portfolio_id": 555767,
-      "ytd": 0.075305,
-      "prior_day": 0.0044540000000000005,
+      "ytd": 0.086233,
+      "prior_day": 0.010161,
       "holdings": [
         {
           "ticker": "SPYM",
@@ -191,8 +191,8 @@
       "name": "Tax Moderate",
       "group": "NelsonCorp",
       "portfolio_id": 1146880,
-      "ytd": 0.075687,
-      "prior_day": 0.002751,
+      "ytd": 0.083924,
+      "prior_day": 0.007657,
       "holdings": [
         {
           "ticker": "VTI",
@@ -244,8 +244,8 @@
       "name": "Aggressive",
       "group": "NelsonCorp",
       "portfolio_id": 597223,
-      "ytd": 0.124971,
-      "prior_day": 0.006832,
+      "ytd": 0.139633,
+      "prior_day": 0.013032,
       "holdings": [
         {
           "ticker": "VTI",
@@ -301,8 +301,8 @@
       "name": "All Tactical",
       "group": "NelsonCorp",
       "portfolio_id": 1297251,
-      "ytd": 0.055947,
-      "prior_day": 0.004969,
+      "ytd": 0.068102,
+      "prior_day": 0.011509,
       "holdings": [
         {
           "ticker": "DIA",
@@ -338,8 +338,8 @@
       "name": "Macro",
       "group": "NelsonCorp",
       "portfolio_id": 1729042,
-      "ytd": 0.241361,
-      "prior_day": 0.011992000000000001,
+      "ytd": 0.263955,
+      "prior_day": 0.018201,
       "holdings": [
         {
           "ticker": "SPHB",
