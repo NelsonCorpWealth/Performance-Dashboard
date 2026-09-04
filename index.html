@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Performance — NelsonCorp Wealth Management</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -28,18 +27,33 @@
       url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232d6a4f' fill-opacity='0.018'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 
-  /* ── HEADER (shared styling with the Big Picture Risk Model dashboard) ── */
-  .hdr{background:var(--green-dark);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:72px;border-bottom:4px solid var(--gold);flex-wrap:wrap;gap:8px}
-  .hdr-left{display:flex;align-items:center;gap:14px}
-  .logo-img{height:42px;filter:brightness(0) invert(1);object-fit:contain}
-  .hdr-div{width:1px;height:30px;background:rgba(255,255,255,0.18)}
-  .hdr-sub{font-size:0.8rem;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase}
-  .hdr-date{font-size:0.82rem;color:rgba(255,255,255,0.4)}
+  /* ── HEADER ── */
+  .site-header{
+    background:linear-gradient(135deg, #152d22 0%, var(--green-dark) 60%, #22553d 100%);
+    padding:0 48px;display:flex;align-items:center;justify-content:space-between;
+    height:80px;border-bottom:3px solid var(--gold);flex-wrap:wrap;gap:10px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.25);position:relative;z-index:10;
+  }
+  .site-header::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(90deg, rgba(201,168,76,0.06) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  .logo-area{display:flex;align-items:center;gap:18px;position:relative;z-index:1}
+  .logo-img{height:46px;object-fit:contain;filter:brightness(0) invert(1)}
+  .logo-divider{width:1px;height:34px;background:rgba(255,255,255,0.18)}
+  .logo-sub{font-size:0.78rem;color:rgba(255,255,255,0.45);letter-spacing:0.14em;text-transform:uppercase;font-weight:600}
+  .header-date{font-size:0.84rem;color:rgba(255,255,255,0.45);position:relative;z-index:1;letter-spacing:0.01em}
 
   /* ── TITLE BAR ── */
-  .title-bar{background:var(--green);padding:16px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  .title-bar h1{font-family:'Merriweather',serif;font-size:1.35rem;font-weight:400;color:#fff}
-  .title-bar h1 span{color:var(--gold-light)}
+  .title-bar{
+    background:linear-gradient(135deg, #2a7a5c 0%, var(--green) 50%, #336b55 100%);
+    padding:18px 48px;display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:12px;border-bottom:1px solid rgba(255,255,255,0.1);
+    box-shadow:0 2px 8px rgba(0,0,0,0.12);
+  }
+  .title-bar h1{font-family:'Merriweather',serif;font-size:1.4rem;font-weight:300;color:rgba(255,255,255,0.95);letter-spacing:0.01em}
+  .title-bar h1 span{color:var(--gold-light);font-weight:700}
   .title-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .update-info{font-size:0.8rem;color:rgba(255,255,255,0.5)}
   .status-badge{
@@ -95,7 +109,17 @@
   }
 
   /* ── CARDS ── */
-  .cards-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:10px}
+    .cards-row{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-bottom:10px}
+  .group-row{display:grid;grid-template-columns:150px repeat(var(--n),1fr);gap:16px;margin-bottom:16px;align-items:stretch}
+  .group-label{background:linear-gradient(160deg,var(--green-dark),#153826);color:#fff;border-radius:var(--radius);padding:16px 14px;display:flex;flex-direction:column;justify-content:center;box-shadow:var(--shadow-sm);border-left:3px solid var(--gold)}
+  .group-label .g-name{font-size:0.7rem;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:var(--gold-light);line-height:1.35}
+  .group-label .g-count{font-size:0.68rem;opacity:.7;margin-top:6px}
+  .group-row .card{min-width:0}
+  .group-row.compact .card{padding:14px 16px}
+  .group-row.compact .card-value{font-size:1.35rem}
+  .group-row.compact .card-label{font-size:0.62rem}
+  @media (max-width:1100px){.group-row{grid-template-columns:repeat(3,1fr)}.group-label{grid-column:1/-1;flex-direction:row;align-items:center;gap:12px;padding:10px 14px}.group-label .g-count{margin-top:0}.cards-row{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:640px){.group-row,.cards-row{grid-template-columns:repeat(2,1fr)}.group-label{grid-column:1/-1}}
   .card{
     background:#fff;border:1px solid var(--border);border-radius:var(--radius);
     padding:20px 22px 18px;position:relative;
@@ -203,27 +227,17 @@
     margin:0 auto 16px;opacity:0.4;
   }
 
-  /* ── MOBILE (header, matches Big Picture) ── */
-  @media(max-width:768px){
-    .hdr,.title-bar{padding-left:18px;padding-right:18px}
-  }
-  @media(max-width:600px){
-    .hdr{height:auto;padding-top:10px;padding-bottom:10px}
-    .hdr-sub{font-size:0.7rem}
-    .hdr-date{font-size:0.72rem}
-    .title-bar h1{font-size:1.1rem}
-  }
 </style>
 </head>
 <body>
-<div class="hdr">
-  <div class="hdr-left">
+<div class="site-header">
+  <div class="logo-area">
     <img src="https://nelsoncorp.com/wp-content/uploads/2025/06/NelsonCorp-Logo-2025.png" alt="NelsonCorp" class="logo-img" onerror="this.style.display='none';document.querySelector('.logo-fallback').style.display='block'">
     <div class="logo-fallback" style="display:none;font-family:'Merriweather',serif;color:#fff;font-size:1.1rem;font-weight:700">NelsonCorp Wealth Management</div>
-    <div class="hdr-div"></div>
-    <div class="hdr-sub">Portfolio Analytics</div>
+    <div class="logo-divider"></div>
+    <div class="logo-sub">Portfolio Analytics</div>
   </div>
-  <div class="hdr-date" id="hdr-date"></div>
+  <div class="header-date" id="header-date"></div>
 </div>
 <div class="title-bar">
   <h1>Daily Portfolio <span>Performance Dashboard</span></h1>
@@ -244,26 +258,27 @@
       </div>
       <div class="dash-source" id="dash-source"></div>
     </div>
+
     <div class="section-header"><div class="section-title">Market Benchmarks</div><div class="section-rule"></div><div class="section-tag">Daily &middot; YTD</div></div>
     <div class="cards-row" id="bench-cards"></div>
-    <div class="section-header"><div class="section-title">Portfolio Models</div><div class="section-rule"></div><div class="section-tag">Daily &middot; YTD &middot; vs Benchmark</div></div>
-    <div class="cards-row" id="model-cards"></div>
-    <div class="section-header"><div class="section-title">Performance Comparison</div><div class="section-rule"></div></div>
-    <div class="chart-card" style="margin-bottom:16px">
-      <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-light);margin-bottom:16px;display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:12px;background:var(--gold);border-radius:2px"></span>Daily Return</div>
-      <canvas id="perf-chart-daily"></canvas>
-    </div>
-    <div class="chart-card" style="margin-bottom:8px">
-      <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-light);margin-bottom:16px;display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:12px;background:var(--gold);border-radius:2px"></span>Year-to-Date Return <span id="ytd-chart-asof" style="font-weight:400;letter-spacing:0;text-transform:none;margin-left:6px"></span></div>
-      <canvas id="perf-chart-ytd"></canvas>
-    </div>
-    <div class="section-header"><div class="section-title">Holdings Detail</div><div class="section-rule"></div></div>
+
+    <div class="section-header"><div class="section-title">Strategy Portfolios</div><div class="section-rule"></div><div class="section-tag">Daily &middot; YTD &middot; vs S&amp;P 500</div></div>
+    <div id="strategy-cards"></div>
+
+    <div class="section-header"><div class="section-title">Strategy Portfolio Holdings</div><div class="section-rule"></div><div class="section-tag">Look-through ETF weights</div></div>
     <div class="holdings-selector-row">
-      <select class="holdings-select" id="holdings-select" onchange="showSelectedPortfolio()">
-        <option value="">&#8212; Select a portfolio &#8212;</option>
-      </select>
+      <select class="holdings-select" id="strategy-select" onchange="showHoldings('strategy')"></select>
     </div>
-    <div id="holdings-panels"></div>
+    <div id="strategy-holdings"></div>
+
+    <div class="section-header" style="margin-top:36px"><div class="section-title">Sleeve Portfolios</div><div class="section-rule"></div><div class="section-tag">Daily &middot; YTD</div></div>
+    <div id="sleeve-cards"></div>
+
+    <div class="section-header"><div class="section-title">Sleeve Portfolio Holdings</div><div class="section-rule"></div><div class="section-tag">ETF weights</div></div>
+    <div class="holdings-selector-row">
+      <select class="holdings-select" id="sleeve-select" onchange="showHoldings('sleeve')"></select>
+    </div>
+    <div id="sleeve-holdings"></div>
   </div>
 </div>
 <div class="site-footer">
@@ -273,119 +288,88 @@
 </div>
 <script>
 // =================================================================
-// NELSONCORP DAILY PERFORMANCE DASHBOARD
+// NELSONCORP DAILY PERFORMANCE DASHBOARD  (v2: strategies + sleeves)
 //
-// Shows TODAY'S return only. No YTD, no spreadsheet, no upload.
-//
-// DATA FLOW
-//   weights.json  -> benchmarks + model holdings (regenerated from
-//                    YCharts when sleeves rotate; see README)
-//   Finnhub       -> live prices, refreshed every 60s
-//   model daily   = sum(weight * ticker daily return)
-//
-// WHY NO YTD: YCharts model calcs lag a trading day, so any YTD shown
-// here had to be compounded forward from a stale base. Today's return
-// needs only prices and weights, both of which are current. If you want
-// YTD, look at YCharts directly - it's authoritative there.
-//
-// UPDATING WEIGHTS: weights.json is the only file that goes stale.
-// Sleeve rotations change the flat ticker weights. The page warns when
-// the file is older than WEIGHTS_WARN_DAYS.
+//   data.json  -> benchmarks, strategy portfolios, sleeve portfolios,
+//                 each with YTD (prior close, from YCharts) and look-through
+//                 ETF weights. Refreshed by the 6am routine.
+//   Finnhub    -> live prices via config.js key, every 2 min
+//   daily      = sum(weight x ticker move)
+//   YTD live   = (1 + YTD base) x (1 + daily) - 1, guarded so a session is
+//                never counted twice. See realtimeYTD().
 // =================================================================
-
-// The Finnhub key lives in config.js (window.FINNHUB_KEY), NOT here, so
-// updating this file never overwrites it. See README.
-const REFRESH_MS = 120000;          // 2 min. 27 tickers -> ~14 calls/min/tab, cap is 60/min
-const MIN_FETCH_GAP_MS = 20000;     // ignore Refresh clicks faster than this
+const REFRESH_MS = 120000;
+const MIN_FETCH_GAP_MS = 20000;
 const RATE_LIMIT_BACKOFF_MS = 150000;
 const FETCH_CONCURRENCY = 3;
-const WEIGHTS_WARN_DAYS = 4;   // routine runs daily; 4 covers a long weekend
+const WEIGHTS_WARN_DAYS = 4;
+const WEIGHTS_CANDIDATES = ['data.json'];
 
-const WEIGHTS_CANDIDATES = ['data.json', 'weights.json'];
+let BENCHMARKS = [], strategies = [], sleeves = [];
+let weightsAsOf = null, benchYTD = {};
+let etfPrices = {}, priceTimer = null, lastFetchAt = 0, fetchInFlight = false;
 
-let BENCHMARKS = [];          // [{ name, ticker }]
-let models = [];              // [{ name, group, holdings: [{ticker, weight}] }]
-let weightsAsOf = null;       // "YYYY-MM-DD"
-let benchYTD = {};            // name -> decimal, as of weightsAsOf
-let modelYTD = {};            // name -> decimal, as of weightsAsOf
-let etfPrices = {};           // ticker -> { daily }
-let priceTimer = null;
-
-document.getElementById('hdr-date').textContent =
+document.getElementById('header-date').textContent =
   new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
 function primaryTicker() { return BENCHMARKS.length ? BENCHMARKS[0].ticker : null; }
 function primaryName()   { return BENCHMARKS.length ? BENCHMARKS[0].name   : 'Benchmark'; }
 
-// -----------------------------------------------------------------
-// Load weights
-// -----------------------------------------------------------------
 async function loadWeights() {
+  if (window.INLINE_DATA) { applyWeights(window.INLINE_DATA); return true; }   // draft preview
   for (const path of WEIGHTS_CANDIDATES) {
     try {
       const res = await fetch(path + '?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) continue;
       applyWeights(await res.json());
-      console.log('weights loaded from', path, '| as of', weightsAsOf);
       return true;
-    } catch (e) {
-      console.warn('failed:', path, e);
-    }
+    } catch (e) { console.warn('failed:', path, e); }
   }
   return false;
 }
 
-function applyWeights(d) {
-  if (!d || !Array.isArray(d.benchmarks) || !Array.isArray(d.models)) {
-    throw new Error('weights file missing benchmarks or models');
-  }
-  if (!d.benchmarks.length || !d.models.length) {
-    throw new Error('weights file is empty');
-  }
-
-  BENCHMARKS = d.benchmarks.map(b => ({
-    name: b.name,
-    ticker: String(b.ticker || '').toUpperCase()
-  }));
-
-  models = d.models.map(m => ({
-    name: m.name,
-    group: m.group || '',
+function normList(list) {
+  return (list || []).map(m => ({
+    name: m.name, group: m.group || '', portfolio_id: m.portfolio_id,
+    ytd: typeof m.ytd === 'number' ? m.ytd : null,
     holdings: (m.holdings || [])
       .map(h => ({ ticker: String(h.ticker || '').toUpperCase(), weight: parseFloat(h.weight) }))
       .filter(h => !isNaN(h.weight) && h.weight > 0)
   }));
-
-  weightsAsOf = d.ytd_as_of || d.weights_as_of || null;
-
-  benchYTD = {}; modelYTD = {};
-  d.benchmarks.forEach(b => { if (typeof b.ytd === 'number') benchYTD[b.name] = b.ytd; });
-  d.models.forEach(m => { if (typeof m.ytd === 'number') modelYTD[m.name] = m.ytd; });
-
-  models.forEach(m => {
-    const sum = m.holdings.reduce((a, h) => a + h.weight, 0);
-    if (Math.abs(sum - 1) > 0.02) {
-      console.warn('weights for "' + m.name + '" sum to ' + (sum * 100).toFixed(2) + '%, not 100%');
-    }
-  });
-
-  document.getElementById('dash-source').textContent =
-    'Live prices every minute  \u00b7  YTD compounds today\u2019s move onto YCharts\u2019 close' +
-    (weightsAsOf ? ' of ' + fmtDate(weightsAsOf) : '');
 }
 
-// -----------------------------------------------------------------
-// Prices
-// -----------------------------------------------------------------
+function applyWeights(d) {
+  if (!d || !Array.isArray(d.benchmarks)) throw new Error('data.json missing benchmarks');
+  BENCHMARKS = d.benchmarks.map(b => ({ name: b.name, ticker: String(b.ticker || '').toUpperCase() }));
+  benchYTD = {}; d.benchmarks.forEach(b => { if (typeof b.ytd === 'number') benchYTD[b.name] = b.ytd; });
+  strategies = normList(d.strategies || d.models);
+  sleeves = normList(d.sleeves);
+  weightsAsOf = d.ytd_as_of || null;
+  [...strategies, ...sleeves].forEach(m => {
+    const s = m.holdings.reduce((a, h) => a + h.weight, 0);
+    if (m.holdings.length && Math.abs(s - 1) > 0.02) console.warn(m.name, 'weights sum to', (s*100).toFixed(2) + '%');
+  });
+  document.getElementById('dash-source').textContent =
+    'Live prices every 2 min  \u00b7  YTD compounds today\u2019s move onto YCharts\u2019 close' + (weightsAsOf ? ' of ' + fmtDate(weightsAsOf) : '');
+}
+
 function allTickers() {
   const s = new Set();
-  BENCHMARKS.forEach(b => { if (b.ticker) s.add(b.ticker); });
-  models.forEach(m => m.holdings.forEach(h => { if (h.ticker && h.ticker !== 'CASH') s.add(h.ticker); }));
+  BENCHMARKS.forEach(b => b.ticker && s.add(b.ticker));
+  [...strategies, ...sleeves].forEach(m => m.holdings.forEach(h => { if (h.ticker && h.ticker !== 'CASH') s.add(h.ticker); }));
   return [...s];
 }
 
-let lastFetchAt = 0;
-let fetchInFlight = false;
+// { daily, covered }: covered = fraction of weight we could price. Cash = 0%.
+function calcDaily(m) {
+  let total = 0, covered = 0;
+  for (const h of m.holdings) {
+    if (h.ticker === 'CASH') { covered += h.weight; continue; }
+    const p = etfPrices[h.ticker];
+    if (p) { total += h.weight * p.daily; covered += h.weight; }
+  }
+  return { daily: covered > 0 ? total : null, covered };
+}
 
 function armTimer(ms) {
   clearInterval(priceTimer); clearTimeout(priceTimer);
@@ -402,6 +386,7 @@ async function fetchAllPrices(opts) {
     setStatus('error', 'No API key');
     document.getElementById('update-info').textContent =
       'config.js is missing or FINNHUB_KEY is not set in it';
+    renderAll();
     return;
   }
 
@@ -496,14 +481,6 @@ async function fetchAllPrices(opts) {
   armTimer(isMarketOpen() ? REFRESH_MS : REFRESH_MS * 5);
 }
 
-// Coming back to a tab: refresh if the data is old.
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && Date.now() - lastFetchAt > REFRESH_MS) fetchAllPrices();
-});
-
-// Most recent COMPLETED trading day, as YYYY-MM-DD in ET. Before 4pm on a
-// weekday that's the prior weekday; after 4pm it's today. Holidays are not
-// special-cased: on one, Finnhub reports a ~0 move, so compounding is harmless.
 function lastCompletedTradingDay() {
   const et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
   const closed = (et.getHours() * 60 + et.getMinutes()) >= 960;   // 4:00pm
@@ -513,7 +490,6 @@ function lastCompletedTradingDay() {
   return d.toISOString().slice(0, 10);
 }
 
-// How many completed sessions the base is missing. 0 = current.
 function sessionsBehind() {
   if (!weightsAsOf) return null;
   const last = lastCompletedTradingDay();
@@ -524,8 +500,6 @@ function sessionsBehind() {
   return n;
 }
 
-// The base is only safely bridgeable by one Finnhub daily move if the
-// session it's missing is TODAY's. A missed session from a prior day is gone.
 function baseIsStale() {
   const behind = sessionsBehind();
   if (behind == null || behind === 0) return false;
@@ -535,12 +509,6 @@ function baseIsStale() {
   return lastCompletedTradingDay() !== today;   // missing session isn't today
 }
 
-// Live YTD = base compounded with today's move - but only when that move
-// isn't already inside the base. Returns { value, mode }:
-//   'live'  market open, base current, compounding intraday move
-//   'est'   after close, base is yesterday, compounding today's close
-//   'base'  base already includes last session and market is closed
-//   'stale' base is 2+ sessions behind - compounding can't fully catch up
 function realtimeYTD(base, daily) {
   if (typeof base !== 'number') return { value: null, mode: 'none' };
   const behind = sessionsBehind();
@@ -569,33 +537,6 @@ function isTradingDayAfterOpen() {
   return (et.getHours() * 60 + et.getMinutes()) >= 570;
 }
 
-// -----------------------------------------------------------------
-// Model math
-// -----------------------------------------------------------------
-// Returns { daily, covered } where covered is the fraction of the
-// portfolio we actually have a quote for. Cash counts as covered at a
-// 0% return. A low covered value means the number understates reality.
-function calcModelDaily(model) {
-  let total = 0, covered = 0;
-  for (const h of model.holdings) {
-    if (h.ticker === 'CASH') { covered += h.weight; continue; }
-    const p = etfPrices[h.ticker];
-    if (p) { total += h.weight * p.daily; covered += h.weight; }
-  }
-  return { daily: covered > 0 ? total : null, covered };
-}
-
-// -----------------------------------------------------------------
-// Render
-// -----------------------------------------------------------------
-function renderAll() {
-  renderWeightsWarning();
-  renderBenchCards();
-  renderModelCards();
-  renderChart();
-  renderHoldingsDropdown();
-}
-
 function renderWeightsWarning() {
   let el = document.getElementById('weights-banner');
   if (!el) {
@@ -617,221 +558,6 @@ function renderWeightsWarning() {
     'The daily routine may have stopped \u2014 check claude.ai/code/routines.';
 }
 
-function renderBenchCards() {
-  const row = document.getElementById('bench-cards');
-  row.innerHTML = '';
-  BENCHMARKS.forEach(b => {
-    const p = etfPrices[b.ticker];
-    const daily = p ? p.daily : null;
-    const div = document.createElement('div');
-    div.className = 'card bench ' + (daily > 0 ? 'positive' : daily < 0 ? 'negative' : '');
-    div.innerHTML =
-      '<div class="card-accent"></div>' +
-      '<div class="card-label">' + b.name + '</div>' +
-      '<div class="card-value ' + cc(daily) + '">' + fmt(daily) + '</div>' +
-      '<div class="card-type">Daily Return \u00b7 ' + b.ticker + '</div>' +
-      ytdRow(benchYTD[b.name], daily);
-    row.appendChild(div);
-  });
-}
-
-function renderModelCards() {
-  const row = document.getElementById('model-cards');
-  row.innerHTML = '';
-  const pt = primaryTicker(), pl = primaryName();
-  const primDaily = pt && etfPrices[pt] ? etfPrices[pt].daily : null;
-
-  models.forEach(m => {
-    const { daily, covered } = calcModelDaily(m);
-    const vsBench = (daily != null && primDaily != null) ? daily - primDaily : null;
-    const gap = covered < 0.99;
-
-    const div = document.createElement('div');
-    div.className = 'card ' + (daily > 0 ? 'positive' : daily < 0 ? 'negative' : '');
-    div.innerHTML =
-      '<div class="card-accent"></div>' +
-      '<div class="card-label">' + m.name + '</div>' +
-      '<div class="card-value ' + cc(daily) + '">' + fmt(daily) + '</div>' +
-      '<div class="card-type">' +
-        (isMarketOpen() ? 'Daily Return (Live)' : isTradingDayAfterOpen() ? "Daily Return (Today's Close)" : 'Daily Return (Prior Close)') +
-      '</div>' +
-      '<div class="card-divider"></div>' +
-      '<div class="card-row"><span>vs ' + pl + '</span><span class="val ' + cc(vsBench) + '">' + fmt(vsBench) + '</span></div>' +
-      ytdRow(modelYTD[m.name], daily) +
-      ytdVsRow(modelYTD[m.name], daily, benchYTD[pl], primDaily, pl) +
-      (gap
-        ? '<div class="card-row"><span style="color:#a07800">\u26a0 Priced</span><span class="val" style="color:#a07800">' +
-          (covered * 100).toFixed(0) + '%</span></div>'
-        : '');
-    row.appendChild(div);
-  });
-}
-
-let chartDaily = null, chartYTD = null;
-
-function renderChart() {
-  renderYTDChart();
-  const all = [
-    ...BENCHMARKS.map(b => ({
-      label: b.name,
-      daily: etfPrices[b.ticker] ? etfPrices[b.ticker].daily : null,
-      isBench: true
-    })),
-    ...models.map(m => ({ label: m.name, daily: calcModelDaily(m).daily, isBench: false }))
-  ];
-
-  const ctx = document.getElementById('perf-chart-daily');
-  if (!ctx) return;
-  if (chartDaily) chartDaily.destroy();
-
-  chartDaily = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: all.map(d => d.label),
-      datasets: [{
-        data: all.map(d => d.daily == null ? null : d.daily * 100),
-        backgroundColor: all.map(d =>
-          d.daily == null ? '#d5dbd6' : d.isBench
-            ? (d.daily >= 0 ? '#95c9a6' : '#e2a3a3')
-            : (d.daily >= 0 ? '#1b4332' : '#a4243b')),
-        borderRadius: 3
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1b4332', borderColor: '#c9a84c', borderWidth: 1,
-          titleColor: '#fff', titleFont: { family: 'Source Sans 3', size: 13 },
-          bodyColor: '#d8f3dc', bodyFont: { family: 'Source Sans 3', size: 13 }, padding: 12,
-          callbacks: {
-            label: c => c.parsed.y == null ? ' \u2014' : ' ' + (c.parsed.y > 0 ? '+' : '') + c.parsed.y.toFixed(2) + '%'
-          }
-        }
-      },
-      scales: {
-        x: { ticks: { color: '#7a917e', font: { family: 'Source Sans 3', size: 12 } }, grid: { color: '#eef0eb' } },
-        y: { ticks: { color: '#7a917e', font: { family: 'Source Sans 3', size: 12 }, callback: v => v.toFixed(2) + '%' }, grid: { color: '#eef0eb' } }
-      }
-    }
-  });
-}
-
-function renderYTDChart() {
-  const ctx = document.getElementById('perf-chart-ytd');
-  if (!ctx) return;
-  const all = [
-    ...BENCHMARKS.map(b => ({ label: b.name,
-      v: realtimeYTD(benchYTD[b.name], etfPrices[b.ticker] ? etfPrices[b.ticker].daily : null).value, isBench: true })),
-    ...models.map(m => ({ label: m.name,
-      v: realtimeYTD(modelYTD[m.name], calcModelDaily(m).daily).value, isBench: false }))
-  ];
-  const asof = document.getElementById('ytd-chart-asof');
-  if (asof) {
-    const mode = realtimeYTD(0, 0).mode;
-    asof.textContent = mode === 'live' ? '(live)' : mode === 'est' ? '(through today\u2019s close)'
-      : weightsAsOf ? '(through ' + fmtDate(weightsAsOf) + ')' : '';
-  }
-  if (chartYTD) chartYTD.destroy();
-  chartYTD = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: all.map(d => d.label),
-      datasets: [{
-        data: all.map(d => typeof d.v === 'number' ? d.v * 100 : null),
-        backgroundColor: all.map(d => typeof d.v !== 'number' ? '#d5dbd6' : d.isBench
-          ? (d.v >= 0 ? '#95c9a6' : '#e2a3a3') : (d.v >= 0 ? '#1b4332' : '#a4243b')),
-        borderRadius: 3
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false }, tooltip: {
-        backgroundColor: '#1b4332', borderColor: '#c9a84c', borderWidth: 1,
-        titleColor: '#fff', bodyColor: '#d8f3dc', padding: 12,
-        callbacks: { label: c => c.parsed.y == null ? ' \u2014' : ' ' + (c.parsed.y > 0 ? '+' : '') + c.parsed.y.toFixed(2) + '%' } } },
-      scales: {
-        x: { ticks: { color: '#7a917e', font: { family: 'Source Sans 3', size: 12 } }, grid: { color: '#eef0eb' } },
-        y: { ticks: { color: '#7a917e', font: { family: 'Source Sans 3', size: 12 }, callback: v => v.toFixed(1) + '%' }, grid: { color: '#eef0eb' } }
-      }
-    }
-  });
-}
-
-function renderHoldingsDropdown() {
-  const select = document.getElementById('holdings-select');
-  const prev = select.value;
-  select.innerHTML = '<option value="">\u2014 Select a portfolio \u2014</option>';
-  models.forEach((m, i) => {
-    const o = document.createElement('option');
-    o.value = i; o.textContent = m.name;
-    select.appendChild(o);
-  });
-  select.value = (prev !== '' && select.querySelector('option[value="' + prev + '"]')) ? prev : '0';
-  showSelectedPortfolio();
-}
-
-function showSelectedPortfolio() {
-  const select = document.getElementById('holdings-select');
-  const container = document.getElementById('holdings-panels');
-  const idx = select.value;
-  if (idx === '' || !models[idx]) { container.innerHTML = ''; return; }
-
-  const m = models[idx], pt = primaryTicker(), pl = primaryName();
-  const primDaily = pt && etfPrices[pt] ? etfPrices[pt].daily : null;
-
-  let liveTotal = 0, rows = '';
-  m.holdings.forEach(h => {
-    const isCash = h.ticker === 'CASH';
-    const quoted = isCash || !!etfPrices[h.ticker];
-    const liveRet = (!isCash && etfPrices[h.ticker]) ? etfPrices[h.ticker].daily : 0;
-    const contrib = h.weight * liveRet;
-    liveTotal += contrib;
-    rows += '<tr><td><span class="ticker-tag">' + h.ticker + '</span></td>' +
-            '<td>' + (h.weight * 100).toFixed(1) + '%</td>' +
-            '<td class="' + cc(liveRet) + '">' + (isCash ? '\u2014' : quoted ? fmt(liveRet) : '<span style="color:#a07800">no quote</span>') + '</td>' +
-            '<td class="' + cc(contrib) + '">' + (isCash || !quoted ? '\u2014' : fmt(contrib)) + '</td></tr>';
-  });
-
-  const liveBench = primDaily != null ? liveTotal - primDaily : null;
-  rows += '<tr class="total-row"><td>Portfolio Total</td><td></td><td></td><td class="' + cc(liveTotal) + '">' + fmt(liveTotal) + '</td></tr>';
-  const benchStr = liveBench != null
-    ? '<span class="panel-bench" style="margin-left:10px">vs ' + pl + ' <span class="' + cc(liveBench) + '">' + fmt(liveBench) + '</span></span>'
-    : '';
-
-  container.innerHTML = '';
-  const wrap = document.createElement('div');
-  wrap.className = 'holdings-panel-wrap';
-  wrap.innerHTML = '<div class="panel"><div class="panel-header">' +
-    '<span class="panel-title">' + m.name + '</span>' +
-    '<div style="display:flex;align-items:center;gap:10px">' +
-      '<span class="panel-return ' + cc(liveTotal) + '">' + fmt(liveTotal) + '</span>' + benchStr +
-    '</div></div>' +
-    '<table><thead><tr><th>Ticker</th><th>Weight</th><th>Return</th><th>Contribution</th></tr></thead>' +
-    '<tbody>' + rows + '</tbody></table></div>';
-  container.appendChild(wrap);
-}
-
-// -----------------------------------------------------------------
-// Helpers
-// -----------------------------------------------------------------
-function setStatus(state, text) {
-  document.getElementById('sdot').className = 'sdot ' + state;
-  document.getElementById('stext').textContent = text;
-}
-function setBanner(msg) {
-  document.getElementById('banner-text').textContent = msg;
-  document.getElementById('price-loading-banner').style.display = 'flex';
-}
-function hideBanner() { document.getElementById('price-loading-banner').style.display = 'none'; }
-function fmtDate(iso) {
-  const d = new Date(iso + 'T00:00:00');
-  return isNaN(d) ? iso : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-// YTD is a prior-close figure from YCharts. It is NOT compounded with
-// today's move - that's deliberate. Label carries the date so nobody
-// mistakes it for live.
 function ytdLabel(mode) {
   const thru = weightsAsOf ? fmtDate(weightsAsOf) : '';
   if (mode === 'live')  return 'YTD <span style="opacity:.6">live</span>';
@@ -839,46 +565,181 @@ function ytdLabel(mode) {
   if (mode === 'stale') return 'YTD <span style="color:#a07800">base ' + thru + ' \u26a0</span>';
   return 'YTD <span style="opacity:.6">thru ' + thru + '</span>';
 }
-function ytdRow(base, daily) {
-  const r = realtimeYTD(base, daily);
-  if (r.value == null) return '';
-  return '<div class="card-divider"></div>' +
-    '<div class="card-row"><span>' + ytdLabel(r.mode) + '</span>' +
-    '<span class="val ' + cc(r.value) + '">' + fmt(r.value) + '</span></div>';
+
+function fmtDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return isNaN(d) ? iso : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
-function ytdVsRow(base, daily, benchBase, benchDaily, pl) {
-  const a = realtimeYTD(base, daily), b = realtimeYTD(benchBase, benchDaily);
-  if (a.value == null || b.value == null) return '';
-  const d = a.value - b.value;
-  return '<div class="card-row"><span>YTD vs ' + pl + '</span><span class="val ' + cc(d) + '">' + fmt(d) + '</span></div>';
+
+function setStatus(state, text) {
+  document.getElementById('sdot').className = 'sdot ' + state;
+  document.getElementById('stext').textContent = text;
 }
+
+function setBanner(msg) {
+  document.getElementById('banner-text').textContent = msg;
+  document.getElementById('price-loading-banner').style.display = 'flex';
+}
+
+function hideBanner() { document.getElementById('price-loading-banner').style.display = 'none'; }
+function fmtDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return isNaN(d) ? iso : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
 function fmt(val, dec = 2) {
   if (val == null || isNaN(val)) return '\u2014';
   const p = val * 100;
   return (p > 0 ? '+' : '') + p.toFixed(dec) + '%';
 }
+
 function cc(val) {
   if (val == null || isNaN(val)) return 'neu';
   return val > 0 ? 'pos' : val < 0 ? 'neg' : 'neu';
 }
 
 // -----------------------------------------------------------------
-// Boot
+// Render
 // -----------------------------------------------------------------
+function renderAll() {
+  renderWeightsWarning();
+  renderBenchCards();
+  renderPortfolioCards(strategies, 'strategy-cards', true, 3, false);
+  renderPortfolioCards(sleeves, 'sleeve-cards', false, 5, true);
+  renderDropdown('strategy', strategies);
+  renderDropdown('sleeve', sleeves);
+}
+
+function dailyLabel() {
+  return isMarketOpen() ? 'Daily Return (Live)' : isTradingDayAfterOpen() ? "Daily Return (Today's Close)" : 'Daily Return (Prior Close)';
+}
+
+function ytdRow(base, daily) {
+  const r = realtimeYTD(base, daily);
+  if (r.value == null) return '<div class="card-divider"></div><div class="card-row"><span>YTD</span><span class="val neu">\u2014</span></div>';
+  return '<div class="card-divider"></div><div class="card-row"><span>' + ytdLabel(r.mode) + '</span><span class="val ' + cc(r.value) + '">' + fmt(r.value) + '</span></div>';
+}
+function ytdVsRow(base, daily, bBase, bDaily, pl) {
+  const a = realtimeYTD(base, daily), b = realtimeYTD(bBase, bDaily);
+  if (a.value == null || b.value == null) return '';
+  const d = a.value - b.value;
+  return '<div class="card-row"><span>YTD vs ' + pl + '</span><span class="val ' + cc(d) + '">' + fmt(d) + '</span></div>';
+}
+
+function renderBenchCards() {
+  const row = document.getElementById('bench-cards'); row.innerHTML = '';
+  BENCHMARKS.forEach(b => {
+    const p = etfPrices[b.ticker], daily = p ? p.daily : null;
+    const div = document.createElement('div');
+    div.className = 'card bench ' + (daily > 0 ? 'positive' : daily < 0 ? 'negative' : '');
+    div.innerHTML = '<div class="card-accent"></div><div class="card-label">' + b.name + '</div>' +
+      '<div class="card-value ' + cc(daily) + '">' + fmt(daily) + '</div>' +
+      '<div class="card-type">Daily Return \u00b7 ' + b.ticker + '</div>' + ytdRow(benchYTD[b.name], daily);
+    row.appendChild(div);
+  });
+}
+
+function renderPortfolioCards(list, containerId, showVsBench, perRow, compact) {
+  const wrap = document.getElementById(containerId); wrap.innerHTML = '';
+  const pt = primaryTicker(), pl = primaryName();
+  const primDaily = pt && etfPrices[pt] ? etfPrices[pt].daily : null;
+
+  // group in first-seen order
+  const groups = [];
+  list.forEach(m => { let g = groups.find(x => x.name === m.group); if (!g) { g = { name: m.group, items: [] }; groups.push(g); } g.items.push(m); });
+
+  groups.forEach(g => {
+    const row = document.createElement('div');
+    row.className = 'group-row' + (compact ? ' compact' : '');
+    row.style.setProperty('--n', perRow);
+    const rows = Math.max(1, Math.ceil(g.items.length / perRow));
+    const label = document.createElement('div');
+    label.className = 'group-label';
+    label.style.gridRow = '1 / span ' + rows;
+    label.innerHTML = '<div class="g-name">' + g.name + '</div><div class="g-count">' + g.items.length + (g.items.length === 1 ? ' portfolio' : ' portfolios') + '</div>';
+    row.appendChild(label);
+
+    g.items.forEach(m => {
+      const { daily, covered } = calcDaily(m);
+      const div = document.createElement('div');
+      div.className = 'card ' + (daily > 0 ? 'positive' : daily < 0 ? 'negative' : '');
+      div.innerHTML = '<div class="card-accent"></div>' +
+        '<div class="card-label">' + m.name + '</div>' +
+        '<div class="card-value ' + cc(daily) + '">' + fmt(daily) + '</div>' +
+        '<div class="card-type">' + dailyLabel() + '</div>' +
+        (showVsBench && daily != null && primDaily != null
+          ? '<div class="card-divider"></div><div class="card-row"><span>vs ' + pl + '</span><span class="val ' + cc(daily - primDaily) + '">' + fmt(daily - primDaily) + '</span></div>'
+          : '') +
+        ytdRow(m.ytd, daily) +
+        (showVsBench ? ytdVsRow(m.ytd, daily, benchYTD[pl], primDaily, pl) : '') +
+        (covered < 0.99 && m.holdings.length
+          ? '<div class="card-row"><span style="color:#a07800">\u26a0 Priced</span><span class="val" style="color:#a07800">' + (covered*100).toFixed(0) + '%</span></div>'
+          : '');
+      row.appendChild(div);
+    });
+    wrap.appendChild(row);
+  });
+}
+
+function renderDropdown(kind, list) {
+  const sel = document.getElementById(kind + '-select');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  let lastGroup = null, og = null;
+  list.forEach((m, i) => {
+    if (m.group !== lastGroup) { og = document.createElement('optgroup'); og.label = m.group; sel.appendChild(og); lastGroup = m.group; }
+    const o = document.createElement('option'); o.value = i; o.textContent = m.name; (og || sel).appendChild(o);
+  });
+  sel.value = (prev !== '' && sel.querySelector('option[value="' + prev + '"]')) ? prev : '0';
+  showHoldings(kind);
+}
+
+function showHoldings(kind) {
+  const list = kind === 'strategy' ? strategies : sleeves;
+  const sel = document.getElementById(kind + '-select');
+  const container = document.getElementById(kind + '-holdings');
+  const m = list[sel.value];
+  if (!m) { container.innerHTML = ''; return; }
+  const pt = primaryTicker(), pl = primaryName();
+  const primDaily = pt && etfPrices[pt] ? etfPrices[pt].daily : null;
+
+  let total = 0, rows = '';
+  m.holdings.forEach(h => {
+    const isCash = h.ticker === 'CASH', p = etfPrices[h.ticker];
+    const quoted = isCash || !!p, ret = (!isCash && p) ? p.daily : 0, contrib = h.weight * ret;
+    total += contrib;
+    rows += '<tr><td><span class="ticker-tag">' + h.ticker + '</span></td><td>' + (h.weight*100).toFixed(1) + '%</td>' +
+      '<td class="' + cc(ret) + '">' + (isCash ? '\u2014' : quoted ? fmt(ret) : '<span style="color:#a07800">no quote</span>') + '</td>' +
+      '<td class="' + cc(contrib) + '">' + (isCash || !quoted ? '\u2014' : fmt(contrib)) + '</td></tr>';
+  });
+  rows += '<tr class="total-row"><td>Portfolio Total</td><td></td><td></td><td class="' + cc(total) + '">' + fmt(total) + '</td></tr>';
+  const vs = (kind === 'strategy' && primDaily != null)
+    ? '<span class="panel-bench" style="margin-left:10px">vs ' + pl + ' <span class="' + cc(total - primDaily) + '">' + fmt(total - primDaily) + '</span></span>' : '';
+  const ytd = realtimeYTD(m.ytd, total);
+  const ytdStr = ytd.value == null ? '' : '<span class="panel-bench" style="margin-left:10px">YTD <span class="' + cc(ytd.value) + '">' + fmt(ytd.value) + '</span></span>';
+
+  container.innerHTML = '<div class="holdings-panel-wrap"><div class="panel"><div class="panel-header">' +
+    '<span class="panel-title">' + m.name + '</span>' +
+    '<div style="display:flex;align-items:center;gap:10px"><span class="panel-return ' + cc(total) + '">' + fmt(total) + '</span>' + vs + ytdStr + '</div></div>' +
+    '<table><thead><tr><th>Ticker</th><th>Weight</th><th>Return</th><th>Contribution</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() - lastFetchAt > REFRESH_MS) fetchAllPrices();
+});
+
 window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('dashboard').style.display = 'block';
-  setBanner('Loading portfolio weights...');
-
+  setBanner('Loading portfolio data...');
   const ok = await loadWeights();
   if (!ok) {
-    setBanner('Could not load weights.json \u2014 dashboard cannot render.');
-    setStatus('error', 'No weights file');
-    document.getElementById('dash-source').textContent =
-      'weights.json is missing from the repo';
+    setBanner('Could not load data.json \u2014 dashboard cannot render.');
+    setStatus('error', 'No data file');
     return;
   }
   fetchAllPrices();
 });
+
 </script>
 </body>
 </html>
