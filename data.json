@@ -1,6 +1,6 @@
 {
   "ytd_as_of": "2026-09-15",
-  "generated_at": "2026-09-16T11:08:35.116572+00:00",
+  "generated_at": "2026-09-16T14:13:28.341354+00:00",
   "source": "YCharts (MCP, cloud routine)",
   "benchmarks": [
     {
@@ -49,7 +49,7 @@
       "prior_day": -0.003186,
       "holdings": [
         {
-          "ticker": "IEF",
+          "ticker": "SGOV",
           "weight": 0.156698
         },
         {
@@ -130,7 +130,7 @@
           "weight": 0.06
         },
         {
-          "ticker": "IEF",
+          "ticker": "SGOV",
           "weight": 0.056678
         },
         {
@@ -150,7 +150,7 @@
           "weight": 0.048125
         },
         {
-          "ticker": "XLK",
+          "ticker": "XLE",
           "weight": 0.048125
         },
         {
@@ -195,7 +195,7 @@
           "weight": 0.070125
         },
         {
-          "ticker": "XLK",
+          "ticker": "XLE",
           "weight": 0.070125
         },
         {
@@ -232,7 +232,7 @@
           "weight": 0.159988
         },
         {
-          "ticker": "IEF",
+          "ticker": "SGOV",
           "weight": 0.120024
         },
         {
@@ -309,7 +309,7 @@
           "weight": 0.04
         },
         {
-          "ticker": "IEF",
+          "ticker": "SGOV",
           "weight": 0.036674
         },
         {
@@ -329,7 +329,7 @@
           "weight": 0.025
         },
         {
-          "ticker": "XLK",
+          "ticker": "XLE",
           "weight": 0.025
         },
         {
@@ -394,7 +394,7 @@
           "weight": 0.026375
         },
         {
-          "ticker": "XLK",
+          "ticker": "XLE",
           "weight": 0.026375
         },
         {
@@ -468,7 +468,7 @@
           "weight": 0.248169
         },
         {
-          "ticker": "XLK",
+          "ticker": "XLE",
           "weight": 0.248169
         },
         {
@@ -814,7 +814,7 @@
       "prior_day": -0.00293,
       "holdings": [
         {
-          "ticker": "XLK",
+          "ticker": "XLE",
           "weight": 1.0
         }
       ]
@@ -896,7 +896,7 @@
       "prior_day": -0.001143,
       "holdings": [
         {
-          "ticker": "IEF",
+          "ticker": "SGOV",
           "weight": 0.3334
         },
         {
