@@ -1,6 +1,6 @@
 {
   "ytd_as_of": "2026-09-29",
-  "generated_at": "2026-09-30T11:06:44+00:00",
+  "generated_at": "2026-09-30T14:42:44+00:00",
   "source": "YCharts (MCP, cloud routine)",
   "benchmarks": [
     {
@@ -50,15 +50,7 @@
       "holdings": [
         {
           "ticker": "SGOV",
-          "weight": 0.156698
-        },
-        {
-          "ticker": "TIP",
-          "weight": 0.156651
-        },
-        {
-          "ticker": "USHY",
-          "weight": 0.156651
+          "weight": 0.47
         },
         {
           "ticker": "VTI",
@@ -102,6 +94,10 @@
       "prior_day": -0.000149,
       "holdings": [
         {
+          "ticker": "SGOV",
+          "weight": 0.17
+        },
+        {
           "ticker": "VTI",
           "weight": 0.1575
         },
@@ -128,18 +124,6 @@
         {
           "ticker": "SFLR",
           "weight": 0.06
-        },
-        {
-          "ticker": "SGOV",
-          "weight": 0.056678
-        },
-        {
-          "ticker": "TIP",
-          "weight": 0.056661
-        },
-        {
-          "ticker": "USHY",
-          "weight": 0.056661
         },
         {
           "ticker": "SPHB",
@@ -228,16 +212,8 @@
       "prior_day": -0.000948,
       "holdings": [
         {
-          "ticker": "TIP",
-          "weight": 0.159988
-        },
-        {
           "ticker": "SGOV",
-          "weight": 0.120024
-        },
-        {
-          "ticker": "USHY",
-          "weight": 0.119988
+          "weight": 0.4
         },
         {
           "ticker": "SPYM",
@@ -293,6 +269,10 @@
           "weight": 0.15165
         },
         {
+          "ticker": "SGOV",
+          "weight": 0.11
+        },
+        {
           "ticker": "VWO",
           "weight": 0.0975
         },
@@ -307,18 +287,6 @@
         {
           "ticker": "PDBC",
           "weight": 0.04
-        },
-        {
-          "ticker": "SGOV",
-          "weight": 0.036674
-        },
-        {
-          "ticker": "TIP",
-          "weight": 0.036663
-        },
-        {
-          "ticker": "USHY",
-          "weight": 0.036663
         },
         {
           "ticker": "SPHB",
@@ -897,15 +865,7 @@
       "holdings": [
         {
           "ticker": "SGOV",
-          "weight": 0.3334
-        },
-        {
-          "ticker": "TIP",
-          "weight": 0.3333
-        },
-        {
-          "ticker": "USHY",
-          "weight": 0.3333
+          "weight": 1.0
         }
       ]
     },
