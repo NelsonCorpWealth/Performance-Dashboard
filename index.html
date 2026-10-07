@@ -55,6 +55,25 @@
 
   /* ── LAYOUT ── */
   .main{max-width:1380px;margin:0 auto;padding:40px 48px 80px}
+  .content{min-width:0}
+  /* Rail lives in the free margin right of the centered content when there is room
+     (JS measures and sets left/width); otherwise it sits in-flow under the benchmarks. */
+  .rail{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 0 10px}
+  .rail.floating{position:fixed;display:block;margin:0;max-height:calc(100vh - 220px);overflow:auto}
+  .rail-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:16px}
+  .rail-head{padding:12px 16px;font-size:0.66rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-light);border-bottom:1px solid var(--light-gray);display:flex;justify-content:space-between;align-items:center}
+  .rail-head .sub{font-weight:400;letter-spacing:0;text-transform:none;font-size:0.68rem}
+  .mover{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid var(--light-gray);font-size:0.86rem}
+  .mover:last-child{border-bottom:none}
+  .mover .rank{width:16px;font-size:0.68rem;color:var(--text-light);font-variant-numeric:tabular-nums}
+  .mover .ticker-tag{font-size:0.74rem}
+  .mover .held{flex:1;font-size:0.7rem;color:var(--text-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mover .ret{font-weight:700;font-variant-numeric:tabular-nums;min-width:62px;text-align:right}
+  .mover .bar{height:4px;border-radius:2px;position:absolute;left:0;bottom:0;opacity:.25}
+  .mover{position:relative}
+  .spark{display:block;width:100%;height:46px;margin-top:10px}
+  .spark-meta{display:flex;justify-content:space-between;font-size:0.62rem;color:var(--text-light);margin-top:2px;font-variant-numeric:tabular-nums}
+  @media (max-width:700px){.rail{grid-template-columns:1fr}}
   .spinner{width:42px;height:42px;border:3px solid var(--light-gray);border-top-color:var(--green-mid);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
   @keyframes spin{to{transform:rotate(360deg)}}
   #dashboard{display:none;animation:fadeUp 0.5s ease}
@@ -231,6 +250,7 @@
   </div>
 </div>
 <div class="main">
+ <div class="content">
   <div id="price-loading-banner" style="background:linear-gradient(135deg,var(--green-xlight),#fff);border:1px solid var(--border);border-radius:8px;padding:13px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px;font-size:0.84rem;color:var(--text-mid);box-shadow:var(--shadow-sm);">
     <div class="spinner" style="width:18px;height:18px;border-width:2px;margin:0;flex-shrink:0;"></div>
     <span id="banner-text">Loading portfolio data...</span>
@@ -245,6 +265,10 @@
 
     <div class="section-header"><div class="section-title">Market Benchmarks</div><div class="section-rule"></div><div class="section-tag">Daily &middot; YTD</div></div>
     <div class="cards-row" id="bench-cards"></div>
+    <aside class="rail" id="rail">
+      <div class="rail-card"><div class="rail-head">Today's Winners <span class="sub" id="winners-sub"></span></div><div id="winners"></div></div>
+      <div class="rail-card"><div class="rail-head">Today's Losers <span class="sub" id="losers-sub"></span></div><div id="losers"></div></div>
+    </aside>
 
     <div class="section-header"><div class="section-title">Strategy Portfolios</div><div class="section-rule"></div><div class="section-tag">Daily &middot; YTD &middot; vs S&amp;P 500</div></div>
     <div id="strategy-cards"></div>
@@ -264,6 +288,7 @@
     </div>
     <div id="sleeve-holdings"></div>
   </div>
+ </div>
 </div>
 <div class="site-footer">
   NelsonCorp Wealth Management &nbsp;&middot;&nbsp; Internal Use Only &nbsp;&middot;&nbsp; 880 13th Avenue North, Clinton, Iowa 52732<br>
@@ -367,6 +392,12 @@ function armTimer(ms) {
 async function fetchAllPrices(opts) {
   const manual = !!(opts && opts.manual);
   if (!BENCHMARKS.length) return;
+  if (window.MOCK_PRICES) {   // mockup only - never present in production
+    etfPrices = window.MOCK_PRICES; if (window.MOCK_INTRADAY) { tdBars = window.MOCK_INTRADAY; tdStatus = 'ok'; } lastFetchAt = Date.now(); fetchInFlight = false; hideBanner();
+    setStatus('live', 'MOCKUP \u00b7 prices as of Oct 7 ~1:45pm');
+    document.getElementById('update-info').textContent = 'Simulated intraday paths \u00b7 real closing moves';
+    renderAll(); return;
+  }
 
   const key = (typeof window !== 'undefined' && window.FINNHUB_KEY) || '';
   if (!key || key === 'PASTE_YOUR_KEY_HERE') {
@@ -419,7 +450,7 @@ async function fetchAllPrices(opts) {
         if (!res.ok) { failed.push(ticker); continue; }
         const q = await res.json();
         if (!q || typeof q.c !== 'number' || typeof q.pc !== 'number' || !q.pc) { failed.push(ticker); continue; }
-        newPrices[ticker] = { daily: (q.c - q.pc) / q.pc };
+        newPrices[ticker] = { daily: (q.c - q.pc) / q.pc, pc: q.pc, c: q.c, openPct: q.o ? (q.o - q.pc) / q.pc : undefined, openTs: openTimestamp() };
       } catch (e) { failed.push(ticker); }
     }
   }
@@ -454,6 +485,8 @@ async function fetchAllPrices(opts) {
   }
 
   etfPrices = newPrices;
+  recordIntraday(newPrices);
+  if (!tdTimer && Object.keys(tdBars).length === 0) fetchIntraday();
   const stamp = new Date().toLocaleTimeString('en-US', { timeStyle: 'short' });
 
   if (isMarketOpen()) {
@@ -520,6 +553,10 @@ function nyseHolidays(y) {
 function isTradingDate(d) {                    // d is a local Date at midnight
   if (d.getDay() === 0 || d.getDay() === 6) return false;
   return !nyseHolidays(d.getFullYear()).has(d.toISOString().slice(0, 10));
+}
+function openTimestamp() {       // today's 9:30 ET as epoch ms (for seeding the sparkline)
+  const et = etNow(); const o = new Date(et); o.setHours(9, 30, 0, 0);
+  return Date.now() - (et.getTime() - o.getTime());
 }
 function etNow() { return new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })); }
 
@@ -638,12 +675,155 @@ function cc(val) {
   return val > 0 ? 'pos' : val < 0 ? 'neg' : 'neu';
 }
 
+
+// -----------------------------------------------------------------
+// Intraday recorder: the page polls every 2 min anyway, so remember each
+// benchmark's move as it goes. Kept in localStorage per trading date so a
+// reload doesn't lose the day. Finnhub's free tier has no intraday bars
+// (candles are 403), so this is the only way to draw a line.
+// -----------------------------------------------------------------
+const MOVERS_N = 5;
+function intradayKey() { const et = etNow(); return 'ncorp_intraday_' + et.toISOString().slice(0,10); }
+function loadIntraday() { try { return JSON.parse(localStorage.getItem(intradayKey()) || '{}'); } catch (e) { return {}; } }
+function recordIntraday(quotes) {
+  if (!isMarketOpen()) return;
+  const store = loadIntraday(), t = Date.now();
+  for (const [sym, q] of Object.entries(quotes)) {
+    if (!q || typeof q.daily !== 'number') continue;
+    const s = store[sym] = store[sym] || [];
+    // seed with the open so a page opened mid-session still draws open -> now
+    if (!s.length && typeof q.openPct === 'number') s.push([q.openTs || t - 60000, q.openPct]);
+    if (!s.length || t - s[s.length-1][0] > 60000) s.push([t, q.daily]);
+  }
+  try { localStorage.setItem(intradayKey(), JSON.stringify(store)); } catch (e) {}
+  // tidy old days
+  try { Object.keys(localStorage).filter(k => k.startsWith('ncorp_intraday_') && k !== intradayKey()).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+}
+// -----------------------------------------------------------------
+// Intraday price paths for the benchmark cards.
+//   Primary : Twelve Data 5-min bars (full session, regardless of when the
+//             page was opened). Key in config.js as window.TWELVEDATA_KEY.
+//             One request for all six symbols every 5 min = 6 credits;
+//             free tier allows 8/min, 800/day.
+//   Fallback: the recorder above (what this page saw while open).
+// -----------------------------------------------------------------
+const TD_REFRESH_MS = 300000;
+let tdTimer = null, tdBars = {}, tdStatus = 'idle';   // ticker -> [{t:'9:30 AM', p: 90.12}, ...]
+
+function tdKeyOk() { const k = window.TWELVEDATA_KEY; return k && k !== 'PASTE_YOUR_KEY_HERE' ? k : null; }
+function etDateString() { return etNow().toISOString().slice(0, 10); }
+function fmtClock(hhmmss) {           // "15:55:00" -> "3:55 PM"
+  const [H, M] = hhmmss.split(':').map(Number); const h12 = ((H + 11) % 12) + 1;
+  return h12 + ':' + String(M).padStart(2, '0') + (H < 12 ? ' AM' : ' PM');
+}
+async function fetchIntraday() {
+  const key = tdKeyOk(); if (!key || !BENCHMARKS.length) return;
+  if (document.hidden) { clearTimeout(tdTimer); tdTimer = setTimeout(fetchIntraday, TD_REFRESH_MS); return; }
+  const syms = BENCHMARKS.map(b => b.ticker);
+  try {
+    const url = 'https://api.twelvedata.com/time_series?symbol=' + syms.join(',') +
+                '&interval=5min&outputsize=90&timezone=America/New_York&apikey=' + key;
+    const res = await fetch(url);
+    const j = await res.json();
+    if (j && j.status === 'error') { tdStatus = j.code === 429 ? 'ratelimit' : 'error'; console.warn('Twelve Data:', j.message); }
+    else {
+      const today = etDateString(); const next = {};
+      const per = syms.length === 1 ? { [syms[0]]: j } : j;
+      for (const s of syms) {
+        const blk = per[s]; if (!blk || blk.status === 'error' || !Array.isArray(blk.values)) continue;
+        const bars = blk.values.filter(v => (v.datetime || '').startsWith(today))
+          .map(v => ({ t: fmtClock(v.datetime.slice(11)), p: parseFloat(v.close) })).filter(v => !isNaN(v.p)).reverse();
+        if (bars.length) next[s] = bars;
+      }
+      if (Object.keys(next).length) { tdBars = next; tdStatus = 'ok'; renderBenchCards(); }
+      else tdStatus = 'nodata';
+    }
+  } catch (e) { tdStatus = 'error'; console.warn('Twelve Data fetch failed', e); }
+  clearTimeout(tdTimer);
+  if (isMarketOpen()) tdTimer = setTimeout(fetchIntraday, tdStatus === 'ratelimit' ? TD_REFRESH_MS * 2 : TD_REFRESH_MS);
+}
+
+function fmtPrice(p) { return p >= 100 ? '$' + p.toFixed(2) : p >= 10 ? '$' + p.toFixed(2) : '$' + p.toFixed(3); }
+
+// Draws a price path with the prior close as the dashed reference line.
+// `bars` = [{t, p}] from Twelve Data, or built from the recorder as a fallback.
+function sparklinePrice(bars, pc, source) {
+  if (!bars || bars.length < 2 || !pc) {
+    const why = !tdKeyOk() ? 'intraday chart needs TWELVEDATA_KEY in config.js' : tdStatus === 'ratelimit' ? 'intraday paused (rate limit)' : 'intraday\u2026';
+    return '<div class="spark-meta"><span>' + why + '</span></div>';
+  }
+  const W = 100, H = 46, pad = 3;
+  const ps = bars.map(b => b.p).concat([pc]);
+  const min = Math.min(...ps), max = Math.max(...ps), span = (max - min) || pc * 0.001;
+  const x = i => pad + (i / (bars.length - 1)) * (W - 2*pad);
+  const y = v => pad + (1 - (v - min) / span) * (H - 2*pad);
+  const pts = bars.map((b, i) => x(i).toFixed(1) + ',' + y(b.p).toFixed(1)).join(' ');
+  const last = bars[bars.length - 1].p, col = last >= pc ? '#1a6b3c' : '#b83232', ref = y(pc).toFixed(1);
+  return '<svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' +
+    '<line x1="0" y1="' + ref + '" x2="' + W + '" y2="' + ref + '" stroke="#c4cbbf" stroke-width="0.6" stroke-dasharray="2 2"/>' +
+    '<polygon points="' + x(0).toFixed(1) + ',' + ref + ' ' + pts + ' ' + x(bars.length-1).toFixed(1) + ',' + ref + '" fill="' + col + '" opacity="0.10"/>' +
+    '<polyline points="' + pts + '" fill="none" stroke="' + col + '" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
+    '</svg><div class="spark-meta"><span>' + bars[0].t + '</span><span>prev close ' + fmtPrice(pc) + (source === 'recorded' ? ' \u00b7 partial' : '') + '</span><span style="color:' + col + ';font-weight:700">' + fmtPrice(last) + '</span></div>';
+}
+function benchSparkline(ticker) {
+  const q = etfPrices[ticker]; const pc = q && q.pc;
+  if (tdBars[ticker] && tdBars[ticker].length >= 2) return sparklinePrice(tdBars[ticker], pc, 'twelvedata');
+  // fallback: convert the recorded % series to prices
+  const rec = loadIntraday()[ticker];
+  if (rec && rec.length >= 2 && pc) {
+    const fmtT = ms => new Date(ms).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+    return sparklinePrice(rec.map(([ms, pct]) => ({ t: fmtT(ms), p: pc * (1 + pct) })), pc, 'recorded');
+  }
+  return sparklinePrice(null, pc);
+}
+
+// Put the movers rail in the empty margin right of the centered content if it
+// fits; otherwise leave it in flow under the benchmarks. Never shifts the content.
+function placeRail() {
+  const rail = document.getElementById('rail'), content = document.querySelector('.content');
+  if (!rail || !content) return;
+  const r = content.getBoundingClientRect();
+  const free = window.innerWidth - r.right;          // px to the right of the content box
+  const GAP = 24, MIN = 190, MAX = 270;
+  if (free >= MIN + GAP * 2) {
+    const w = Math.min(MAX, free - GAP * 2);
+    // top = where the controls row sits when the page is scrolled to the top,
+    // so the rail starts in line with the content, below the title bar
+    const ctl = document.querySelector('.dash-controls');
+    const top = ctl ? Math.max(100, ctl.getBoundingClientRect().top + window.scrollY) : 200;
+    rail.classList.add('floating'); rail.classList.toggle('narrow', w < 235);
+    rail.style.left = (r.right + GAP) + 'px'; rail.style.width = w + 'px'; rail.style.top = top + 'px';
+  } else {
+    rail.classList.remove('floating', 'narrow'); rail.style.left = ''; rail.style.width = '';
+  }
+}
+window.addEventListener('resize', placeRail);
+
+function renderMovers() {
+  const held = {};   // ticker -> number of portfolios holding it
+  [...strategies, ...sleeves].forEach(m => m.holdings.forEach(h => { if (h.ticker !== 'CASH') held[h.ticker] = (held[h.ticker] || 0) + 1; }));
+  const rows = Object.entries(etfPrices).filter(([t]) => held[t]).map(([t, p]) => ({ t, d: p.daily, n: held[t] }));
+  if (!rows.length) { document.getElementById('winners').innerHTML = document.getElementById('losers').innerHTML = '<div class="mover" style="color:var(--text-light)">No prices yet</div>'; return; }
+  rows.sort((a, b) => b.d - a.d);
+  const win = rows.slice(0, MOVERS_N), los = rows.slice(-MOVERS_N).reverse();
+  const maxAbs = Math.max(...rows.map(r => Math.abs(r.d))) || 1;
+  const row = (r, i) => '<div class="mover"><span class="rank">' + (i+1) + '</span><span class="ticker-tag">' + r.t + '</span>' +
+    '<span class="held"></span><span class="ret ' + cc(r.d) + '">' + fmt(r.d) + '</span>' +
+    '<span class="bar" style="width:' + (Math.abs(r.d)/maxAbs*100).toFixed(0) + '%;background:' + (r.d >= 0 ? '#1a6b3c' : '#b83232') + '"></span></div>';
+  document.getElementById('winners').innerHTML = win.map(row).join('');
+  document.getElementById('losers').innerHTML  = los.map(row).join('');
+  document.getElementById('winners-sub').textContent = 'of ' + rows.length + ' ETFs';
+  document.getElementById('losers-sub').textContent  = dailyLabel().replace('Daily Return ', '').replace(/[()]/g,'');
+}
+
 // -----------------------------------------------------------------
 // Render
 // -----------------------------------------------------------------
 function renderAll() {
   renderWeightsWarning();
   renderBenchCards();
+  renderMovers();
+  placeRail();
   renderPortfolioCards(strategies, 'strategy-cards', true, 3, false);
   renderPortfolioCards(sleeves, 'sleeve-cards', false, 5, true);
   renderDropdown('strategy', strategies);
@@ -674,7 +854,8 @@ function renderBenchCards() {
     div.className = 'card bench ' + (daily > 0 ? 'positive' : daily < 0 ? 'negative' : '');
     div.innerHTML = '<div class="card-accent"></div><div class="card-label">' + b.name + '</div>' +
       '<div class="card-value ' + cc(daily) + '">' + fmt(daily) + '</div>' +
-      '<div class="card-type">Daily Return \u00b7 ' + b.ticker + '</div>' + ytdRow(benchYTD[b.name], daily);
+      '<div class="card-type">Daily Return \u00b7 ' + b.ticker + '</div>' + ytdRow(benchYTD[b.name], daily) +
+      benchSparkline(b.ticker);
     row.appendChild(div);
   });
 }
@@ -766,6 +947,7 @@ function showHoldings(kind) {
 
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && Date.now() - lastFetchAt > REFRESH_MS) fetchAllPrices();
+  if (!document.hidden && tdKeyOk()) fetchIntraday();
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
