@@ -716,9 +716,14 @@ function fmtClock(hhmmss) {           // "15:55:00" -> "3:55 PM"
   const [H, M] = hhmmss.split(':').map(Number); const h12 = ((H + 11) % 12) + 1;
   return h12 + ':' + String(M).padStart(2, '0') + (H < 12 ? ' AM' : ' PM');
 }
-async function fetchIntraday() {
+let lastTdFetchAt = 0;
+async function fetchIntraday(force) {
   const key = tdKeyOk(); if (!key || !BENCHMARKS.length) return;
   if (document.hidden) { clearTimeout(tdTimer); tdTimer = setTimeout(fetchIntraday, TD_REFRESH_MS); return; }
+  // Throttle: never more than one request per minute from this page, no matter
+  // how many reloads or tab switches happen. 6 credits per request, 8/min cap.
+  if (!force && Date.now() - lastTdFetchAt < 60000) return;
+  lastTdFetchAt = Date.now();
   const syms = BENCHMARKS.map(b => b.ticker);
   try {
     const url = 'https://api.twelvedata.com/time_series?symbol=' + syms.join(',') +
@@ -947,7 +952,7 @@ function showHoldings(kind) {
 
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && Date.now() - lastFetchAt > REFRESH_MS) fetchAllPrices();
-  if (!document.hidden && tdKeyOk()) fetchIntraday();
+  if (!document.hidden && tdKeyOk() && Date.now() - lastTdFetchAt > TD_REFRESH_MS) fetchIntraday();
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
