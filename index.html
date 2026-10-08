@@ -751,24 +751,37 @@ async function fetchIntraday(force) {
 function fmtPrice(p) { return p >= 100 ? '$' + p.toFixed(2) : p >= 10 ? '$' + p.toFixed(2) : '$' + p.toFixed(3); }
 
 // Draws a price path with the prior close as the dashed reference line.
-// `bars` = [{t, p}] from Twelve Data, or built from the recorder as a fallback.
+// X axis is the FULL session (9:30 - 4:00 ET), so a partial day fills in from
+// the left as bars arrive, instead of stretching to the card's full width.
+// `bars` = [{t:'10:20 AM', p}] from Twelve Data, or from the recorder as a fallback.
+const SESSION_MIN = 390;                               // 9:30 -> 16:00
+function minutesFromOpen(t) {                          // "10:20 AM" -> 50
+  const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(t.trim()); if (!m) return null;
+  let H = +m[1] % 12; if (m[3].toUpperCase() === 'PM') H += 12;
+  return H * 60 + (+m[2]) - 570;
+}
 function sparklinePrice(bars, pc, source) {
   if (!bars || bars.length < 2 || !pc) {
     const why = !tdKeyOk() ? 'intraday chart needs TWELVEDATA_KEY in config.js' : tdStatus === 'ratelimit' ? 'intraday paused (rate limit)' : 'intraday\u2026';
     return '<div class="spark-meta"><span>' + why + '</span></div>';
   }
   const W = 100, H = 46, pad = 3;
-  const ps = bars.map(b => b.p).concat([pc]);
+  const pts = bars.map(b => ({ m: minutesFromOpen(b.t), p: b.p, t: b.t })).filter(b => b.m != null && b.m >= 0 && b.m <= SESSION_MIN);
+  if (pts.length < 2) return '<div class="spark-meta"><span>intraday\u2026</span></div>';
+  const ps = pts.map(b => b.p).concat([pc]);
   const min = Math.min(...ps), max = Math.max(...ps), span = (max - min) || pc * 0.001;
-  const x = i => pad + (i / (bars.length - 1)) * (W - 2*pad);
+  const x = m => pad + (m / SESSION_MIN) * (W - 2*pad);
   const y = v => pad + (1 - (v - min) / span) * (H - 2*pad);
-  const pts = bars.map((b, i) => x(i).toFixed(1) + ',' + y(b.p).toFixed(1)).join(' ');
-  const last = bars[bars.length - 1].p, col = last >= pc ? '#1a6b3c' : '#b83232', ref = y(pc).toFixed(1);
+  const poly = pts.map(b => x(b.m).toFixed(1) + ',' + y(b.p).toFixed(1)).join(' ');
+  const lastB = pts[pts.length - 1], last = lastB.p, col = last >= pc ? '#1a6b3c' : '#b83232', ref = y(pc).toFixed(1);
+  const xEnd = x(lastB.m).toFixed(1), yEnd = y(last).toFixed(1);
   return '<svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' +
     '<line x1="0" y1="' + ref + '" x2="' + W + '" y2="' + ref + '" stroke="#c4cbbf" stroke-width="0.6" stroke-dasharray="2 2"/>' +
-    '<polygon points="' + x(0).toFixed(1) + ',' + ref + ' ' + pts + ' ' + x(bars.length-1).toFixed(1) + ',' + ref + '" fill="' + col + '" opacity="0.10"/>' +
-    '<polyline points="' + pts + '" fill="none" stroke="' + col + '" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
-    '</svg><div class="spark-meta"><span>' + bars[0].t + '</span><span>prev close ' + fmtPrice(pc) + (source === 'recorded' ? ' \u00b7 partial' : '') + '</span><span style="color:' + col + ';font-weight:700">' + fmtPrice(last) + '</span></div>';
+    '<polygon points="' + x(pts[0].m).toFixed(1) + ',' + ref + ' ' + poly + ' ' + xEnd + ',' + ref + '" fill="' + col + '" opacity="0.10"/>' +
+    '<polyline points="' + poly + '" fill="none" stroke="' + col + '" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
+    '<circle cx="' + xEnd + '" cy="' + yEnd + '" r="1.6" fill="' + col + '" vector-effect="non-scaling-stroke"/>' +
+    '</svg><div class="spark-meta"><span>9:30</span><span>prev close ' + fmtPrice(pc) + (source === 'recorded' ? ' \u00b7 partial' : '') + '</span>' +
+    '<span style="color:' + col + ';font-weight:700">' + lastB.t.replace(' ', '\u202f') + ' ET \u00b7 ' + fmtPrice(last) + '</span></div>';
 }
 function benchSparkline(ticker) {
   const q = etfPrices[ticker]; const pc = q && q.pc;
