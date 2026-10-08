@@ -1,74 +1,116 @@
 # NelsonCorp Daily Performance Dashboard
 
-Live daily returns from Finnhub, YTD and weights from YCharts via a daily
-cloud routine. Fully automated, no API key, no local machine.
+Live daily returns for the firm's strategy and sleeve portfolios, with YTD and
+look-through holdings refreshed from YCharts every morning. Runs on GitHub Pages;
+nothing runs on a local machine.
+
+**Live:** https://nelsoncorpwealth.github.io/Performance-Dashboard/
 
 ```
-6am CT, Anthropic cloud                  every 60s, in the browser
-┌────────────────────────────┐          ┌──────────────────────────┐
-│ Claude Code routine        │          │ index.html               │
-│  YCharts MCP connector     │          │  data.json  → weights,   │
-│  → flatten sleeves         │  commit  │              YTD as-of   │
-│  → data.json               │ ───────► │  Finnhub    → today's    │
-│  → validate_data.py gate   │          │              move        │
-│  → git push main           │          └──────────────────────────┘
-└────────────────────────────┘
+ 6:00am CT, weekdays                            in the browser
+ ┌──────────────────────────────┐              ┌──────────────────────────────────────────┐
+ │ Claude Code cloud routine    │              │ index.html                               │
+ │  • YCharts MCP connector     │  data.json   │  data.json  → portfolios, groups, YTD,   │
+ │  • 33 portfolios, sleeves    │ ───────────► │               look-through ETF weights   │
+ │    flattened to ETF weights  │  (commit +   │  Finnhub    → live quote for every ETF   │
+ │  • validate_data.py gate     │   promote)   │               every 2 min                │
+ │  • push → claude/* branch    │              │  Twelve Data→ 5-min intraday bars for    │
+ └──────────────┬───────────────┘              │               the six benchmark charts   │
+                │ GitHub Action re-validates,  └──────────────────────────────────────────┘
+                ▼ fast-forwards to main
 ```
 
-**Setup:** `SETUP_ROUTINE.md`. **What the routine does:** `ROUTINE_PROMPT.md`.
+## What's on the page
 
-## What's shown
+**Market Benchmarks** — six ETFs (S&P 500 / SPYM, Dow / DIA, Nasdaq 100 / QQQ,
+U.S. Bonds / AGG, U.S. Dollar / UUP, Commodities / PDBC). Each card: today's
+move, live YTD, and an intraday price chart on a fixed 9:30–4:00 ET axis that
+fills in through the session. Dashed line is the prior close.
 
-**Daily** is live: Finnhub prices × flattened target weights, every minute.
+**Today's Winners / Losers** — top and bottom five of the ETFs currently held
+across the portfolios, by today's move. Floats in the free margin to the right
+of the content on wide screens; drops below the benchmarks on narrow ones.
 
-**YTD** is YCharts' prior-close figure compounded with today's live move —
-but only when today's move isn't already inside the base. The label says
-which state it's in:
+**Strategy Portfolios** — 13, in five label-rail rows: Core, Absolute Return,
+Tactical, Tax Sensitive, IA3. Each card: daily, vs S&P 500, live YTD, YTD vs
+S&P 500. Holdings detail below, defaulting to Moderate.
 
-| Label | When | What it is |
-|---|---|---|
-| YTD *live* | market open | base × (1 + today's move) |
-| YTD *thru today's close* | after 4pm, before the 6am refresh | base × (1 + today's close move) |
-| YTD *thru Sep 3* | pre-open, weekends | base alone — today's move is already in it |
-| YTD *base Sep 3 ⚠* | routine missed a day | understated; banner explains |
+**Sleeve Portfolios** — 20, in five rows: Standard Equity, Standard Macro,
+Standard Alternatives & Bonds, Tax Sensitive Equity, Tax Sensitive Fixed
+Income. Daily and YTD. Holdings detail below, defaulting to Tactical Stock L/S.
 
-The guard against double-counting: between the 6am refresh and the 9:30
-open, the base already includes yesterday but Finnhub still reports
-yesterday's move. The page shows the base alone in that window.
+## How the numbers work
 
-The compounding only ever covers one session. If the routine misses a day,
-the missing session can't be recovered from live prices, so the page says
-so rather than showing a plausible wrong number.
+**Daily** = Σ(look-through ETF weight × that ETF's move from prior close), from
+live Finnhub quotes. Target weights, not drifted actuals, so intraday figures
+are directional. A ticker Finnhub can't quote shows as reduced coverage on the
+card, never as a silent zero.
 
-## Why this shape
+**YTD** = YCharts' own figure for each portfolio as of the prior close, compounded
+with today's live move: `(1 + YTD) × (1 + daily) − 1`. The label states which
+case applies:
 
-YCharts model calculations lag one trading day and catch up overnight. A
-6am run gets yesterday's close reliably. The routine runs on Anthropic's
-cloud using your existing YCharts connector, so the credential problem that
-blocked a plain cron job doesn't apply.
+| Label | When |
+|---|---|
+| YTD live | market open |
+| YTD thru today's close | after 4pm, before the next morning's refresh |
+| YTD thru *date* | pre-open and weekends — the base already includes the last session |
+| YTD base *date* ⚠ | routine missed a day; figure is understated and a banner says so |
 
-## Six benchmarks, 13 strategy portfolios, 20 sleeve portfolios
+Only one session is ever compounded. Weekends and NYSE holidays are computed
+from the exchange rules, so a Monday holiday doesn't trip a false stale warning.
 
-S&P 500 / SPYM · Dow / DIA · Nasdaq 100 / QQQ · U.S. Bonds / AGG ·
-U.S. Dollar / UUP · Commodities / PDBC
+**Intraday charts** are Twelve Data 5-minute bars for the six benchmarks. The
+page requests all six in one call, every 5 minutes during market hours, at
+most once a minute no matter how many reloads — ~470 of the 800 free daily
+credits. If Twelve Data is unavailable the card falls back to a line the page
+recorded from its own polls, labeled "partial."
 
-Strategy portfolios are grouped Core → Absolute Return → Tactical → Tax Sensitive → IA3; sleeves are grouped Standard (Equity, Macro, Alternatives & Bonds) then Tax Sensitive (Equity, Fixed Income). Every display name, group and YCharts ID is in `ROUTINE_PROMPT.md` and `validate_data.py` — those two lists must agree. IDs were confirmed by matching YCharts holdings against the old workbook, not by name.
+## The daily routine
 
-## Adding or removing a model
+A Claude Code cloud routine ("Dashboard data refresh", claude.ai/code/routines)
+runs weekdays at 6:00am CT. It pulls points and holdings for all 33 portfolios
+from YCharts, recursively flattens nested sleeves to ETF weights, writes
+`data.json`, runs `validate_data.py`, and commits only if values changed. The
+prompt is `ROUTINE_PROMPT.md` — the routine holds its own copy, so edits must
+be pasted into its Instructions.
 
-Edit the table in `ROUTINE_PROMPT.md` (and paste it into the routine's Instructions) **and**
-`EXPECTED_STRATEGIES` / `EXPECTED_SLEEVES` in `validate_data.py`. Both, or the validator rejects the
-next run. Ask me for the ID if you don't have it — I'll confirm by holdings.
+The platform routes its push to a `claude/*` branch. `.github/workflows/
+promote-data.yml` re-runs the validator on GitHub's side and fast-forwards
+`main` only if `data.json` is the sole changed file. Two independent gates.
 
-## Honest caveats
+YCharts model figures lag a trading day and catch up overnight, so the 6am run
+reliably gets the prior close. Changes made in YCharts *after* 6am appear the
+next morning — or sooner with **Run now** on the routine page (~4 minutes).
 
-- **Target weights, not drifted.** Intraday model returns are directional.
-- **Missing quotes show.** A ticker Finnhub can't price appears as reduced
-  coverage on the card, not silently as zero.
-- **Finnhub key lives in `config.js`**, not `index.html`, so page updates
-  never overwrite it. It's still public and gets revoked now and then; the
-  page names the problem when it happens. Fix: edit `config.js`, one line.
-- **Rate limit is 60 calls/min.** Each open tab uses ~14/min during market
-  hours. Background tabs pause polling, and a rate-limit hit keeps the last
-  prices and retries after 2.5 minutes rather than going blank.
-- **Routines are research preview.**
+## Files
+
+| File | Role |
+|---|---|
+| `index.html` | The page. No secrets inside. |
+| `config.js` | `FINNHUB_KEY` and `TWELVEDATA_KEY`. Separate so page updates never overwrite them. |
+| `data.json` | Written by the routine. Don't edit by hand. |
+| `validate_data.py` | The gate: exact portfolio names, groups, order and IDs; weights sum to 100%; percent-vs-decimal leaks; stale as-of. |
+| `ROUTINE_PROMPT.md` | What the routine does, including the 33 portfolio IDs. |
+| `.github/workflows/promote-data.yml` | Promotes the routine's branch to `main` after re-validating. |
+
+## Adding or removing a portfolio
+
+Edit the table in `ROUTINE_PROMPT.md` **and** `EXPECTED_STRATEGIES` /
+`EXPECTED_SLEEVES` in `validate_data.py` (both, or the validator rejects the
+next run), then paste the new prompt into the routine's Instructions. Display
+order on the page follows the table order. IDs should be confirmed by matching
+holdings in YCharts, not by name — several portfolios have near-duplicate names.
+
+## Known limits
+
+- **Both API keys are public.** They sit in `config.js` in this repo. Free
+  tiers, disposable, but each gets revoked now and then. The page names which
+  one failed; the fix is one line in `config.js`.
+- **Finnhub: 60 calls/min.** Each visible tab uses ~20/min during market hours.
+  Background tabs pause. A rate-limit hit keeps the last prices and retries.
+- **Twelve Data: 8 credits/min, 800/day.** Thin ETFs (UUP, PDBC) report fewer
+  bars because they trade less often.
+- **Intraday charts need Finnhub's prior close** for the reference line. If
+  Finnhub is limited at load, the charts show "intraday…" until it recovers.
+- **Routines are in research preview.**
