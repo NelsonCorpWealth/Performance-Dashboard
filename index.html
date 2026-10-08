@@ -929,7 +929,10 @@ function renderDropdown(kind, list) {
     if (m.group !== lastGroup) { og = document.createElement('optgroup'); og.label = m.group; sel.appendChild(og); lastGroup = m.group; }
     const o = document.createElement('option'); o.value = i; o.textContent = m.name; (og || sel).appendChild(o);
   });
-  sel.value = (prev !== '' && sel.querySelector('option[value="' + prev + '"]')) ? prev : '0';
+  // Default selection on first render; afterwards keep whatever the user picked.
+  const DEFAULTS = { strategy: 'Moderate', sleeve: 'Tactical Stock L/S' };
+  const defIdx = Math.max(0, list.findIndex(m => m.name === DEFAULTS[kind]));
+  sel.value = (prev !== '' && sel.querySelector('option[value="' + prev + '"]')) ? prev : String(defIdx);
   showHoldings(kind);
 }
 
