@@ -1,6 +1,6 @@
 {
   "ytd_as_of": "2026-10-12",
-  "generated_at": "2026-10-13T11:06:50+00:00",
+  "generated_at": "2026-10-13T15:53:18+00:00",
   "source": "YCharts (MCP, cloud routine)",
   "benchmarks": [
     {
@@ -57,24 +57,20 @@
           "weight": 0.12
         },
         {
-          "ticker": "DIA",
+          "ticker": "JPST",
+          "weight": 0.108
+        },
+        {
+          "ticker": "MINT",
           "weight": 0.084
         },
         {
-          "ticker": "QQQM",
+          "ticker": "SHV",
           "weight": 0.084
         },
         {
-          "ticker": "SPYM",
+          "ticker": "GSY",
           "weight": 0.084
-        },
-        {
-          "ticker": "VWO",
-          "weight": 0.054
-        },
-        {
-          "ticker": "VOO",
-          "weight": 0.054
         },
         {
           "ticker": "SFLR",
@@ -102,31 +98,27 @@
           "weight": 0.1575
         },
         {
-          "ticker": "DIA",
+          "ticker": "JPST",
+          "weight": 0.12
+        },
+        {
+          "ticker": "MINT",
           "weight": 0.09335
         },
         {
-          "ticker": "QQQM",
+          "ticker": "SHV",
           "weight": 0.09335
         },
         {
-          "ticker": "SPYM",
+          "ticker": "GSY",
           "weight": 0.0933
-        },
-        {
-          "ticker": "VWO",
-          "weight": 0.06
-        },
-        {
-          "ticker": "VOO",
-          "weight": 0.06
         },
         {
           "ticker": "SFLR",
           "weight": 0.06
         },
         {
-          "ticker": "SPHB",
+          "ticker": "USMV",
           "weight": 0.048125
         },
         {
@@ -138,8 +130,12 @@
           "weight": 0.048125
         },
         {
+          "ticker": "SPLV",
+          "weight": 0.024063
+        },
+        {
           "ticker": "SPMO",
-          "weight": 0.048125
+          "weight": 0.024063
         },
         {
           "ticker": "CASH",
@@ -159,19 +155,23 @@
           "weight": 0.2295
         },
         {
-          "ticker": "DIA",
+          "ticker": "JPST",
+          "weight": 0.126
+        },
+        {
+          "ticker": "MINT",
           "weight": 0.098
         },
         {
-          "ticker": "QQQM",
+          "ticker": "SHV",
           "weight": 0.098
         },
         {
-          "ticker": "SPYM",
+          "ticker": "GSY",
           "weight": 0.098
         },
         {
-          "ticker": "SPHB",
+          "ticker": "USMV",
           "weight": 0.070125
         },
         {
@@ -183,20 +183,16 @@
           "weight": 0.070125
         },
         {
-          "ticker": "SPMO",
-          "weight": 0.070125
-        },
-        {
-          "ticker": "VWO",
-          "weight": 0.063
-        },
-        {
-          "ticker": "VOO",
-          "weight": 0.063
-        },
-        {
           "ticker": "SFLR",
           "weight": 0.06
+        },
+        {
+          "ticker": "SPLV",
+          "weight": 0.035063
+        },
+        {
+          "ticker": "SPMO",
+          "weight": 0.035063
         },
         {
           "ticker": "CASH",
@@ -216,24 +212,20 @@
           "weight": 0.4
         },
         {
-          "ticker": "SPYM",
+          "ticker": "JPST",
+          "weight": 0.15
+        },
+        {
+          "ticker": "GSY",
           "weight": 0.1167
         },
         {
-          "ticker": "DIA",
+          "ticker": "MINT",
           "weight": 0.11665
         },
         {
-          "ticker": "QQQM",
+          "ticker": "SHV",
           "weight": 0.11665
-        },
-        {
-          "ticker": "VWO",
-          "weight": 0.075
-        },
-        {
-          "ticker": "VOO",
-          "weight": 0.075
         },
         {
           "ticker": "SFLR",
@@ -257,28 +249,24 @@
       "prior_day": -0.00091,
       "holdings": [
         {
-          "ticker": "SPYM",
+          "ticker": "JPST",
+          "weight": 0.195
+        },
+        {
+          "ticker": "GSY",
           "weight": 0.1517
         },
         {
-          "ticker": "DIA",
+          "ticker": "MINT",
           "weight": 0.15165
         },
         {
-          "ticker": "QQQM",
+          "ticker": "SHV",
           "weight": 0.15165
         },
         {
           "ticker": "SGOV",
           "weight": 0.11
-        },
-        {
-          "ticker": "VWO",
-          "weight": 0.0975
-        },
-        {
-          "ticker": "VOO",
-          "weight": 0.0975
         },
         {
           "ticker": "SFLR",
@@ -289,7 +277,7 @@
           "weight": 0.04
         },
         {
-          "ticker": "SPHB",
+          "ticker": "USMV",
           "weight": 0.025
         },
         {
@@ -301,16 +289,20 @@
           "weight": 0.025
         },
         {
-          "ticker": "SPMO",
-          "weight": 0.025
-        },
-        {
           "ticker": "REZ",
           "weight": 0.02
         },
         {
           "ticker": "INDS",
           "weight": 0.02
+        },
+        {
+          "ticker": "SPLV",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "SPMO",
+          "weight": 0.0125
         },
         {
           "ticker": "CASH",
@@ -326,24 +318,20 @@
       "prior_day": -0.000912,
       "holdings": [
         {
-          "ticker": "DIA",
+          "ticker": "JPST",
+          "weight": 0.21
+        },
+        {
+          "ticker": "MINT",
           "weight": 0.16335
         },
         {
-          "ticker": "QQQM",
+          "ticker": "SHV",
           "weight": 0.16335
         },
         {
-          "ticker": "SPYM",
+          "ticker": "GSY",
           "weight": 0.1633
-        },
-        {
-          "ticker": "VWO",
-          "weight": 0.105
-        },
-        {
-          "ticker": "VOO",
-          "weight": 0.105
         },
         {
           "ticker": "VTI",
@@ -354,7 +342,7 @@
           "weight": 0.05
         },
         {
-          "ticker": "SPHB",
+          "ticker": "USMV",
           "weight": 0.026375
         },
         {
@@ -366,16 +354,20 @@
           "weight": 0.026375
         },
         {
-          "ticker": "SPMO",
-          "weight": 0.026375
-        },
-        {
           "ticker": "REZ",
           "weight": 0.025
         },
         {
           "ticker": "INDS",
           "weight": 0.025
+        },
+        {
+          "ticker": "SPLV",
+          "weight": 0.013188
+        },
+        {
+          "ticker": "SPMO",
+          "weight": 0.013188
         },
         {
           "ticker": "CASH",
@@ -391,28 +383,24 @@
       "prior_day": -0.004449,
       "holdings": [
         {
-          "ticker": "DIA",
+          "ticker": "JPST",
+          "weight": 0.25
+        },
+        {
+          "ticker": "MINT",
           "weight": 0.1967
         },
         {
-          "ticker": "QQQM",
+          "ticker": "SHV",
           "weight": 0.1967
         },
         {
-          "ticker": "SPYM",
+          "ticker": "GSY",
           "weight": 0.1966
         },
         {
-          "ticker": "SPHB",
+          "ticker": "BIL",
           "weight": 0.15
-        },
-        {
-          "ticker": "VWO",
-          "weight": 0.125
-        },
-        {
-          "ticker": "VOO",
-          "weight": 0.125
         },
         {
           "ticker": "CASH",
@@ -428,7 +416,7 @@
       "prior_day": -0.006176,
       "holdings": [
         {
-          "ticker": "SPHB",
+          "ticker": "USMV",
           "weight": 0.248169
         },
         {
@@ -440,8 +428,12 @@
           "weight": 0.248169
         },
         {
+          "ticker": "SPLV",
+          "weight": 0.124084
+        },
+        {
           "ticker": "SPMO",
-          "weight": 0.248169
+          "weight": 0.124084
         },
         {
           "ticker": "CASH",
@@ -465,6 +457,10 @@
           "weight": 0.164
         },
         {
+          "ticker": "JMST",
+          "weight": 0.1333
+        },
+        {
           "ticker": "MEAR",
           "weight": 0.1092
         },
@@ -477,16 +473,8 @@
           "weight": 0.084
         },
         {
-          "ticker": "SPYM",
+          "ticker": "GSY",
           "weight": 0.0667
-        },
-        {
-          "ticker": "DIA",
-          "weight": 0.06665
-        },
-        {
-          "ticker": "QQQM",
-          "weight": 0.06665
         },
         {
           "ticker": "PTLC",
@@ -514,6 +502,10 @@
           "weight": 0.21
         },
         {
+          "ticker": "JMST",
+          "weight": 0.1333
+        },
+        {
           "ticker": "BOXX",
           "weight": 0.13
         },
@@ -534,16 +526,8 @@
           "weight": 0.08
         },
         {
-          "ticker": "SPYM",
+          "ticker": "GSY",
           "weight": 0.0667
-        },
-        {
-          "ticker": "DIA",
-          "weight": 0.06665
-        },
-        {
-          "ticker": "QQQM",
-          "weight": 0.06665
         },
         {
           "ticker": "MEAR",
@@ -567,6 +551,10 @@
           "weight": 0.336
         },
         {
+          "ticker": "JMST",
+          "weight": 0.1667
+        },
+        {
           "ticker": "OMFL",
           "weight": 0.144
         },
@@ -575,15 +563,7 @@
           "weight": 0.12
         },
         {
-          "ticker": "DIA",
-          "weight": 0.08335
-        },
-        {
-          "ticker": "QQQM",
-          "weight": 0.08335
-        },
-        {
-          "ticker": "SPYM",
+          "ticker": "GSY",
           "weight": 0.0833
         },
         {
@@ -608,11 +588,15 @@
       "prior_day": 8.9e-05,
       "holdings": [
         {
-          "ticker": "MINT",
-          "weight": 0.1485
+          "ticker": "ICSH",
+          "weight": 0.33
         },
         {
-          "ticker": "VRIG",
+          "ticker": "GBIL",
+          "weight": 0.33
+        },
+        {
+          "ticker": "MINT",
           "weight": 0.1485
         },
         {
@@ -620,31 +604,7 @@
           "weight": 0.1155
         },
         {
-          "ticker": "JAAA",
-          "weight": 0.1155
-        },
-        {
-          "ticker": "BKLN",
-          "weight": 0.0825
-        },
-        {
-          "ticker": "SRLN",
-          "weight": 0.0825
-        },
-        {
-          "ticker": "SHYG",
-          "weight": 0.0825
-        },
-        {
-          "ticker": "JBBB",
-          "weight": 0.0825
-        },
-        {
           "ticker": "TFLO",
-          "weight": 0.066
-        },
-        {
-          "ticker": "FLOT",
           "weight": 0.066
         },
         {
@@ -709,11 +669,11 @@
       "prior_day": -0.002082,
       "holdings": [
         {
-          "ticker": "DIA",
+          "ticker": "MINT",
           "weight": 0.5
         },
         {
-          "ticker": "QQQM",
+          "ticker": "SHV",
           "weight": 0.5
         }
       ]
@@ -726,7 +686,7 @@
       "prior_day": -0.000655,
       "holdings": [
         {
-          "ticker": "SPYM",
+          "ticker": "GSY",
           "weight": 1.0
         }
       ]
@@ -739,12 +699,8 @@
       "prior_day": -0.000573,
       "holdings": [
         {
-          "ticker": "VWO",
-          "weight": 0.5
-        },
-        {
-          "ticker": "VOO",
-          "weight": 0.5
+          "ticker": "JPST",
+          "weight": 1.0
         }
       ]
     },
@@ -769,7 +725,7 @@
       "prior_day": -0.021471,
       "holdings": [
         {
-          "ticker": "SPHB",
+          "ticker": "USMV",
           "weight": 1.0
         }
       ]
@@ -808,8 +764,12 @@
       "prior_day": -0.011908,
       "holdings": [
         {
+          "ticker": "SPLV",
+          "weight": 0.5
+        },
+        {
           "ticker": "SPMO",
-          "weight": 1.0
+          "weight": 0.5
         }
       ]
     },
@@ -911,12 +871,8 @@
       "prior_day": -0.002082,
       "holdings": [
         {
-          "ticker": "DIA",
-          "weight": 0.5
-        },
-        {
-          "ticker": "QQQM",
-          "weight": 0.5
+          "ticker": "JMST",
+          "weight": 1.0
         }
       ]
     },
