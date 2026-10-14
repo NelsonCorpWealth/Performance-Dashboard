@@ -302,15 +302,15 @@
 //   data.json  -> benchmarks, strategy portfolios, sleeve portfolios,
 //                 each with YTD (prior close, from YCharts) and look-through
 //                 ETF weights. Refreshed by the 6am routine.
-//   Finnhub    -> live prices via config.js key, every 2 min
+//   Worker     -> live YCharts prices + intraday bars, every 2 min (QUOTES_URL in config.js)
 //   daily      = sum(weight x ticker move)
 //   YTD live   = (1 + YTD base) x (1 + daily) - 1, guarded so a session is
 //                never counted twice. See realtimeYTD().
 // =================================================================
-const REFRESH_MS = 120000;
-const MIN_FETCH_GAP_MS = 20000;
-const RATE_LIMIT_BACKOFF_MS = 150000;
-const FETCH_CONCURRENCY = 3;
+// Prices come from the firm's Cloudflare Worker, which reads YCharts.
+// window.QUOTES_URL is set in config.js. No API keys anywhere in this repo.
+const REFRESH_MS = 120000;          // 2 min
+const MIN_FETCH_GAP_MS = 20000;     // ignore Refresh clicks faster than this
 const WEIGHTS_WARN_DAYS = 4;
 const WEIGHTS_CANDIDATES = ['data.json'];
 
@@ -392,123 +392,82 @@ function armTimer(ms) {
 async function fetchAllPrices(opts) {
   const manual = !!(opts && opts.manual);
   if (!BENCHMARKS.length) return;
+
   if (window.MOCK_PRICES) {   // mockup only - never present in production
-    etfPrices = window.MOCK_PRICES; if (window.MOCK_INTRADAY) { tdBars = window.MOCK_INTRADAY; tdStatus = 'ok'; } lastFetchAt = Date.now(); fetchInFlight = false; hideBanner();
-    setStatus('live', 'MOCKUP \u00b7 prices as of Oct 7 ~1:45pm');
-    document.getElementById('update-info').textContent = 'Simulated intraday paths \u00b7 real closing moves';
+    etfPrices = window.MOCK_PRICES; if (window.MOCK_INTRADAY) { tdBars = window.MOCK_INTRADAY; }
+    lastFetchAt = Date.now(); fetchInFlight = false; hideBanner(); setStatus('live', 'MOCKUP'); renderAll(); return;
+  }
+
+  const base = (window.QUOTES_URL || '').replace(/\/+$/, '');
+  if (!base) {
+    hideBanner(); setStatus('error', 'No feed URL');
+    document.getElementById('update-info').textContent = 'config.js is missing or QUOTES_URL is not set in it';
     renderAll(); return;
   }
-
-  const key = (typeof window !== 'undefined' && window.FINNHUB_KEY) || '';
-  if (!key || key === 'PASTE_YOUR_KEY_HERE') {
-    hideBanner();
-    setStatus('error', 'No API key');
-    document.getElementById('update-info').textContent =
-      'config.js is missing or FINNHUB_KEY is not set in it';
-    renderAll();
-    return;
-  }
-
-  // Don't spend quota on a tab nobody is looking at. Re-check when visible.
   if (document.hidden && !manual) {
-    // Not the visible tab: don't spend quota. Render what we have and say so.
-    hideBanner();
-    setStatus('loading', 'Paused \u2014 tab in background');
+    hideBanner(); setStatus('loading', 'Paused \u2014 tab in background');
     document.getElementById('update-info').textContent = 'Prices refresh when this tab is visible';
-    if (BENCHMARKS.length) renderAll();
-    armTimer(REFRESH_MS);
-    return;
+    if (BENCHMARKS.length) renderAll(); armTimer(REFRESH_MS); return;
   }
-
   const since = Date.now() - lastFetchAt;
   if (manual && since < MIN_FETCH_GAP_MS) {
-    document.getElementById('update-info').textContent =
-      'Refreshed ' + Math.round(since / 1000) + 's ago \u2014 wait a moment';
-    return;
+    document.getElementById('update-info').textContent = 'Refreshed ' + Math.round(since / 1000) + 's ago \u2014 wait a moment'; return;
   }
   if (fetchInFlight) return;
-  fetchInFlight = true;
-  lastFetchAt = Date.now();
+  fetchInFlight = true; lastFetchAt = Date.now();
+  setBanner('Fetching live prices...'); setStatus('loading', 'Fetching prices...');
 
-  setBanner('Fetching live prices...');
-  setStatus('loading', 'Fetching prices...');
-
-  const tickers = allTickers();
-  const newPrices = {};
-  const failed = [];
-  let authFailed = false, rateLimited = false;
-
-  const queue = [...tickers];
-  async function worker() {
-    while (queue.length) {
-      const ticker = queue.shift();
-      try {
-        const res = await fetch('https://finnhub.io/api/v1/quote?symbol=' +
-                                encodeURIComponent(ticker) + '&token=' + key);
-        if (res.status === 401 || res.status === 403) { authFailed = true; queue.length = 0; return; }
-        if (res.status === 429) { rateLimited = true; queue.length = 0; return; }
-        if (!res.ok) { failed.push(ticker); continue; }
-        const q = await res.json();
-        if (!q || typeof q.c !== 'number' || typeof q.pc !== 'number' || !q.pc) { failed.push(ticker); continue; }
-        newPrices[ticker] = { daily: (q.c - q.pc) / q.pc, pc: q.pc, c: q.c, openPct: q.o ? (q.o - q.pc) / q.pc : undefined, openTs: openTimestamp() };
-      } catch (e) { failed.push(ticker); }
+  let payload = null;
+  try {
+    const res = await fetch(base + '/quotes?t=' + Date.now(), { cache: 'no-store' });
+    payload = await res.json().catch(() => null);
+    if (!res.ok) {
+      fetchInFlight = false; hideBanner(); setStatus('error', 'Feed error');
+      document.getElementById('update-info').textContent = (payload && payload.error) || ('Quote feed returned ' + res.status);
+      if (Object.keys(etfPrices).length) renderAll();
+      armTimer(REFRESH_MS); return;
     }
+  } catch (e) {
+    fetchInFlight = false; hideBanner(); setStatus('error', 'Feed unreachable');
+    document.getElementById('update-info').textContent = 'Could not reach the quote feed \u2014 check QUOTES_URL in config.js';
+    armTimer(REFRESH_MS); return;
   }
-  await Promise.all(Array.from({ length: FETCH_CONCURRENCY }, worker));
-  fetchInFlight = false;
-  hideBanner();
+  fetchInFlight = false; hideBanner();
 
-  if (authFailed) {
-    setStatus('error', 'API key rejected');
-    document.getElementById('update-info').textContent =
-      'Finnhub rejected the key \u2014 it may have been revoked. Get a new one at finnhub.io and update config.js.';
-    return;   // no point retrying
+  const quotes = (payload && payload.quotes) || {};
+  const tickers = allTickers();
+  const fetched = tickers.filter(t => quotes[t]).length;
+  if (!fetched) {
+    setStatus('error', 'No quotes'); document.getElementById('update-info').textContent = 'Quote feed returned no prices';
+    armTimer(REFRESH_MS); return;
   }
+  etfPrices = {};
+  for (const t of tickers) if (quotes[t] && typeof quotes[t].daily === 'number') etfPrices[t] = { daily: quotes[t].daily, c: quotes[t].c, pc: quotes[t].pc };
 
-  if (rateLimited) {
-    // Keep whatever prices we already had on screen; retry after a backoff.
-    const retryAt = new Date(Date.now() + RATE_LIMIT_BACKOFF_MS).toLocaleTimeString('en-US', { timeStyle: 'short' });
-    setStatus('error', 'Rate limited');
-    document.getElementById('update-info').textContent =
-      'Finnhub rate limit (60/min) hit \u2014 usually several dashboard tabs open. Showing last prices; retrying at ' + retryAt + '.';
-    if (Object.keys(etfPrices).length) renderAll();
-    armTimer(RATE_LIMIT_BACKOFF_MS);
-    return;
-  }
+  const updated = payload.updated ? new Date(payload.updated) : new Date();
+  const stamp = updated.toLocaleTimeString('en-US', { timeStyle: 'short' });
+  const missing = tickers.filter(t => !etfPrices[t]);
 
-  const fetched = Object.keys(newPrices).length;
-  if (fetched === 0) {
-    setStatus('error', 'Price fetch failed');
-    document.getElementById('update-info').textContent = 'Could not reach Finnhub \u2014 check connection';
-    armTimer(REFRESH_MS);
-    return;
-  }
-
-  etfPrices = newPrices;
-  recordIntraday(newPrices);
-  if (!tdTimer && Object.keys(tdBars).length === 0) fetchIntraday();
-  const stamp = new Date().toLocaleTimeString('en-US', { timeStyle: 'short' });
-
-  if (isMarketOpen()) {
+  if (isMarketOpen() && payload.isToday) {
     setStatus('live', 'Live \u00b7 ' + fetched + '/' + tickers.length + ' tickers');
-    document.getElementById('update-info').textContent = 'Prices updated ' + stamp;
-  } else if (isTradingDayAfterOpen()) {
+    document.getElementById('update-info').textContent = 'YCharts prices as of ' + stamp;
+  } else if (isTradingDayAfterOpen() && payload.isToday) {
     setStatus('loading', "Market closed \u2014 today's close");
     document.getElementById('update-info').textContent = "Today's closing prices \u00b7 " + stamp;
   } else {
     setStatus('loading', 'Market closed \u2014 prior close');
-    document.getElementById('update-info').textContent = 'Prior trading day\u2019s close \u00b7 ' + stamp;
+    document.getElementById('update-info').textContent = 'Prior trading day\u2019s close' + (payload.asof ? ' (' + payload.asof + ')' : '');
   }
-
-  if (failed.length) {
-    console.warn('no quote for:', failed.join(', '));
-    document.getElementById('update-info').textContent += '  \u00b7  \u26a0 No quote for ' + failed.join(', ');
+  if (missing.length) {
+    console.warn('no quote for:', missing.join(', '));
+    document.getElementById('update-info').textContent += '  \u00b7  \u26a0 No quote for ' + missing.join(', ');
   }
 
   renderAll();
-  // Off-hours the numbers don't move; poll gently.
+  fetchIntraday();
   armTimer(isMarketOpen() ? REFRESH_MS : REFRESH_MS * 5);
 }
+
 
 // ---- NYSE holiday calendar, computed from the rules so it never goes stale ----
 function nthWeekday(y, m, dow, n) {            // n-th (1-based) weekday dow in month m (0-based)
@@ -677,76 +636,25 @@ function cc(val) {
 
 
 // -----------------------------------------------------------------
-// Intraday recorder: the page polls every 2 min anyway, so remember each
-// benchmark's move as it goes. Kept in localStorage per trading date so a
-// reload doesn't lose the day. Finnhub's free tier has no intraday bars
-// (candles are 403), so this is the only way to draw a line.
+// Intraday price paths for the benchmark cards. The Worker records a bar
+// every 5 minutes during market hours (shared by every viewer), so the line
+// is complete regardless of when this page was opened.
 // -----------------------------------------------------------------
 const MOVERS_N = 5;
-function intradayKey() { const et = etNow(); return 'ncorp_intraday_' + et.toISOString().slice(0,10); }
-function loadIntraday() { try { return JSON.parse(localStorage.getItem(intradayKey()) || '{}'); } catch (e) { return {}; } }
-function recordIntraday(quotes) {
-  if (!isMarketOpen()) return;
-  const store = loadIntraday(), t = Date.now();
-  for (const [sym, q] of Object.entries(quotes)) {
-    if (!q || typeof q.daily !== 'number') continue;
-    const s = store[sym] = store[sym] || [];
-    // seed with the open so a page opened mid-session still draws open -> now
-    if (!s.length && typeof q.openPct === 'number') s.push([q.openTs || t - 60000, q.openPct]);
-    if (!s.length || t - s[s.length-1][0] > 60000) s.push([t, q.daily]);
-  }
-  try { localStorage.setItem(intradayKey(), JSON.stringify(store)); } catch (e) {}
-  // tidy old days
-  try { Object.keys(localStorage).filter(k => k.startsWith('ncorp_intraday_') && k !== intradayKey()).forEach(k => localStorage.removeItem(k)); } catch (e) {}
-}
-// -----------------------------------------------------------------
-// Intraday price paths for the benchmark cards.
-//   Primary : Twelve Data 5-min bars (full session, regardless of when the
-//             page was opened). Key in config.js as window.TWELVEDATA_KEY.
-//             One request for all six symbols every 5 min = 6 credits;
-//             free tier allows 8/min, 800/day.
-//   Fallback: the recorder above (what this page saw while open).
-// -----------------------------------------------------------------
-const TD_REFRESH_MS = 300000;
-let tdTimer = null, tdBars = {}, tdStatus = 'idle';   // ticker -> [{t:'9:30 AM', p: 90.12}, ...]
-
-function tdKeyOk() { const k = window.TWELVEDATA_KEY; return k && k !== 'PASTE_YOUR_KEY_HERE' ? k : null; }
-function etDateString() { return etNow().toISOString().slice(0, 10); }
-function fmtClock(hhmmss) {           // "15:55:00" -> "3:55 PM"
-  const [H, M] = hhmmss.split(':').map(Number); const h12 = ((H + 11) % 12) + 1;
-  return h12 + ':' + String(M).padStart(2, '0') + (H < 12 ? ' AM' : ' PM');
-}
-let lastTdFetchAt = 0;
-async function fetchIntraday(force) {
-  const key = tdKeyOk(); if (!key || !BENCHMARKS.length) return;
-  if (document.hidden) { clearTimeout(tdTimer); tdTimer = setTimeout(fetchIntraday, TD_REFRESH_MS); return; }
-  // Throttle: never more than one request per minute from this page, no matter
-  // how many reloads or tab switches happen. 6 credits per request, 8/min cap.
-  if (!force && Date.now() - lastTdFetchAt < 60000) return;
+let tdBars = {}, tdStatus = 'idle', lastTdFetchAt = 0;
+async function fetchIntraday() {
+  const base = (window.QUOTES_URL || '').replace(/\/+$/, '');
+  if (!base || !BENCHMARKS.length) return;
+  if (Date.now() - lastTdFetchAt < 60000) return;
   lastTdFetchAt = Date.now();
-  const syms = BENCHMARKS.map(b => b.ticker);
   try {
-    const url = 'https://api.twelvedata.com/time_series?symbol=' + syms.join(',') +
-                '&interval=5min&outputsize=90&timezone=America/New_York&apikey=' + key;
-    const res = await fetch(url);
+    const res = await fetch(base + '/intraday?t=' + Date.now(), { cache: 'no-store' });
     const j = await res.json();
-    if (j && j.status === 'error') { tdStatus = j.code === 429 ? 'ratelimit' : 'error'; console.warn('Twelve Data:', j.message); }
-    else {
-      const today = etDateString(); const next = {};
-      const per = syms.length === 1 ? { [syms[0]]: j } : j;
-      for (const s of syms) {
-        const blk = per[s]; if (!blk || blk.status === 'error' || !Array.isArray(blk.values)) continue;
-        const bars = blk.values.filter(v => (v.datetime || '').startsWith(today))
-          .map(v => ({ t: fmtClock(v.datetime.slice(11)), p: parseFloat(v.close) })).filter(v => !isNaN(v.p)).reverse();
-        if (bars.length) next[s] = bars;
-      }
-      if (Object.keys(next).length) { tdBars = next; tdStatus = 'ok'; renderBenchCards(); }
-      else tdStatus = 'nodata';
-    }
-  } catch (e) { tdStatus = 'error'; console.warn('Twelve Data fetch failed', e); }
-  clearTimeout(tdTimer);
-  if (isMarketOpen()) tdTimer = setTimeout(fetchIntraday, tdStatus === 'ratelimit' ? TD_REFRESH_MS * 2 : TD_REFRESH_MS);
+    if (res.ok && j && j.bars) { tdBars = j.bars; tdStatus = 'ok'; renderBenchCards(); }
+    else tdStatus = 'error';
+  } catch (e) { tdStatus = 'error'; }
 }
+function tdKeyOk() { return !!window.QUOTES_URL; }
 
 function fmtPrice(p) { return p >= 100 ? '$' + p.toFixed(2) : p >= 10 ? '$' + p.toFixed(2) : '$' + p.toFixed(3); }
 
@@ -762,7 +670,7 @@ function minutesFromOpen(t) {                          // "10:20 AM" -> 50
 }
 function sparklinePrice(bars, pc, source) {
   if (!bars || bars.length < 2 || !pc) {
-    const why = !tdKeyOk() ? 'intraday chart needs TWELVEDATA_KEY in config.js' : tdStatus === 'ratelimit' ? 'intraday paused (rate limit)' : 'intraday\u2026';
+    const why = !tdKeyOk() ? 'intraday chart needs QUOTES_URL in config.js' : tdStatus === 'error' ? 'intraday unavailable' : 'intraday\u2026';
     return '<div class="spark-meta"><span>' + why + '</span></div>';
   }
   const W = 100, H = 46, pad = 3;
@@ -780,18 +688,12 @@ function sparklinePrice(bars, pc, source) {
     '<polygon points="' + x(pts[0].m).toFixed(1) + ',' + ref + ' ' + poly + ' ' + xEnd + ',' + ref + '" fill="' + col + '" opacity="0.10"/>' +
     '<polyline points="' + poly + '" fill="none" stroke="' + col + '" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
     '<circle cx="' + xEnd + '" cy="' + yEnd + '" r="1.6" fill="' + col + '" vector-effect="non-scaling-stroke"/>' +
-    '</svg><div class="spark-meta"><span>9:30</span><span>prev close ' + fmtPrice(pc) + (source === 'recorded' ? ' \u00b7 partial' : '') + '</span>' +
+    '</svg><div class="spark-meta"><span>9:30</span><span>prev close ' + fmtPrice(pc) + '' + '</span>' +
     '<span style="color:' + col + ';font-weight:700">' + lastB.t.replace(' ', '\u202f') + ' ET \u00b7 ' + fmtPrice(last) + '</span></div>';
 }
 function benchSparkline(ticker) {
   const q = etfPrices[ticker]; const pc = q && q.pc;
-  if (tdBars[ticker] && tdBars[ticker].length >= 2) return sparklinePrice(tdBars[ticker], pc, 'twelvedata');
-  // fallback: convert the recorded % series to prices
-  const rec = loadIntraday()[ticker];
-  if (rec && rec.length >= 2 && pc) {
-    const fmtT = ms => new Date(ms).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
-    return sparklinePrice(rec.map(([ms, pct]) => ({ t: fmtT(ms), p: pc * (1 + pct) })), pc, 'recorded');
-  }
+  if (tdBars[ticker] && tdBars[ticker].length >= 2) return sparklinePrice(tdBars[ticker], pc, 'ycharts');
   return sparklinePrice(null, pc);
 }
 
@@ -968,7 +870,6 @@ function showHoldings(kind) {
 
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && Date.now() - lastFetchAt > REFRESH_MS) fetchAllPrices();
-  if (!document.hidden && tdKeyOk() && Date.now() - lastTdFetchAt > TD_REFRESH_MS) fetchIntraday();
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
