@@ -40,7 +40,6 @@ You are updating `data.json` in this repository from YCharts. The file feeds a l
 | Tax Core Stock | Tax Sensitive · Equity | 1146835 |
 | Tax Tactical Stock | Tax Sensitive · Equity | 1146853 |
 | Tax Tactical Stock L/S | Tax Sensitive · Equity | 1146860 |
-| Tax Regional Stock | Tax Sensitive · Equity | 1146845 |
 | Tax Var Rate Preferred | Tax Sensitive · Fixed Income | 1534983 |
 | Tax Core Bond BOXX | Tax Sensitive · Fixed Income | 1277723 |
 | Tax Int-Term Muni 1 | Tax Sensitive · Fixed Income | 1277725 |
@@ -49,11 +48,11 @@ Benchmarks (name / ticker): S&P 500 / SPYM · Dow / DIA · Nasdaq 100 / QQQ · U
 
 ## Steps
 
-1. Points. Call get_model_portfolio_points with ALL 33 IDs above (strategies + sleeves) and calc_names="ytd_total_return,roc_1". Record the date on the returned points — that is the as-of date. Values are in PERCENT; divide by 100.
+1. Points. Call get_model_portfolio_points with ALL 32 IDs above (strategies + sleeves) and calc_names="ytd_total_return,roc_1". Record the date on the returned points — that is the as-of date. Values are in PERCENT; divide by 100.
 
 2. Benchmark YTD. Call get_fund_data with the six benchmark tickers. Take ytd_total_return from each. Percent; divide by 100.
 
-3. Holdings, flattened. Call get_model_portfolio_holdings for all 33 IDs, weight_type="target" (batches of 10). Strategy portfolios hold SLEEVES — nested portfolios whose security_id starts with "P:" — up to three levels deep. Some sleeves also nest. For every P: holding, fetch that portfolio's holdings and multiply weights down the path until only real tickers remain. Cache: many sleeves are shared.
+3. Holdings, flattened. Call get_model_portfolio_holdings for all 32 IDs, weight_type="target" (batches of 10). Strategy portfolios hold SLEEVES — nested portfolios whose security_id starts with "P:" — up to three levels deep. Some sleeves also nest. For every P: holding, fetch that portfolio's holdings and multiply weights down the path until only real tickers remain. Cache: many sleeves are shared.
    - Drop any holding with weight 0.000000 (inactive universe positions).
    - Map $:CASH, M:FZFXX, M:FDRXX to ticker CASH.
    - Weights are percent; divide by 100.

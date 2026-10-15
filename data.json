@@ -650,7 +650,7 @@
   "sleeves": [
     {
       "name": "Core Stock",
-      "group": "Standard · Equity",
+      "group": "Standard \u00b7 Equity",
       "portfolio_id": 548985,
       "ytd": 0.138955,
       "prior_day": -0.011644,
@@ -663,7 +663,7 @@
     },
     {
       "name": "Tactical Stock L/S",
-      "group": "Standard · Equity",
+      "group": "Standard \u00b7 Equity",
       "portfolio_id": 1141466,
       "ytd": 0.065167,
       "prior_day": 0.000149,
@@ -680,7 +680,7 @@
     },
     {
       "name": "Tactical Stock L/S (S&P)",
-      "group": "Standard · Equity",
+      "group": "Standard \u00b7 Equity",
       "portfolio_id": 1470892,
       "ytd": 0.083682,
       "prior_day": -0.0004,
@@ -693,7 +693,7 @@
     },
     {
       "name": "Regional Stock L/S",
-      "group": "Standard · Equity",
+      "group": "Standard \u00b7 Equity",
       "portfolio_id": 1141467,
       "ytd": 0.064663,
       "prior_day": -0.000199,
@@ -706,7 +706,7 @@
     },
     {
       "name": "Defined Risk",
-      "group": "Standard · Equity",
+      "group": "Standard \u00b7 Equity",
       "portfolio_id": 1145523,
       "ytd": 0.06114,
       "prior_day": -0.004793,
@@ -719,7 +719,7 @@
     },
     {
       "name": "Big Picture L/S (SPHB/USMV)",
-      "group": "Standard · Macro",
+      "group": "Standard \u00b7 Macro",
       "portfolio_id": 1184181,
       "ytd": 0.09917,
       "prior_day": -0.000199,
@@ -732,7 +732,7 @@
     },
     {
       "name": "Bond Duration L/S (XLK/XLE)",
-      "group": "Standard · Macro",
+      "group": "Standard \u00b7 Macro",
       "portfolio_id": 1271763,
       "ytd": 0.320291,
       "prior_day": 0.006399,
@@ -745,7 +745,7 @@
     },
     {
       "name": "Dollar L/S (AMLP/GDX)",
-      "group": "Standard · Macro",
+      "group": "Standard \u00b7 Macro",
       "portfolio_id": 1195046,
       "ytd": 0.288408,
       "prior_day": -0.044017,
@@ -758,7 +758,7 @@
     },
     {
       "name": "Economic Regime",
-      "group": "Standard · Macro",
+      "group": "Standard \u00b7 Macro",
       "portfolio_id": 1962097,
       "ytd": 0.192854,
       "prior_day": -0.007435,
@@ -775,7 +775,7 @@
     },
     {
       "name": "Real Estate",
-      "group": "Standard · Alternatives & Bonds",
+      "group": "Standard \u00b7 Alternatives & Bonds",
       "portfolio_id": 1145687,
       "ytd": -0.050537,
       "prior_day": -0.004305,
@@ -792,7 +792,7 @@
     },
     {
       "name": "Commodity",
-      "group": "Standard · Alternatives & Bonds",
+      "group": "Standard \u00b7 Alternatives & Bonds",
       "portfolio_id": 1146127,
       "ytd": 0.366575,
       "prior_day": -0.006006,
@@ -805,7 +805,7 @@
     },
     {
       "name": "Dollar",
-      "group": "Standard · Alternatives & Bonds",
+      "group": "Standard \u00b7 Alternatives & Bonds",
       "portfolio_id": 1146153,
       "ytd": -0.011457,
       "prior_day": -0.002356,
@@ -818,7 +818,7 @@
     },
     {
       "name": "Core Bond 1",
-      "group": "Standard · Alternatives & Bonds",
+      "group": "Standard \u00b7 Alternatives & Bonds",
       "portfolio_id": 548980,
       "ytd": -0.017509,
       "prior_day": 0.000199,
@@ -831,7 +831,7 @@
     },
     {
       "name": "Tax Core Stock",
-      "group": "Tax Sensitive · Equity",
+      "group": "Tax Sensitive \u00b7 Equity",
       "portfolio_id": 1146835,
       "ytd": 0.144929,
       "prior_day": -0.009965,
@@ -848,7 +848,7 @@
     },
     {
       "name": "Tax Tactical Stock",
-      "group": "Tax Sensitive · Equity",
+      "group": "Tax Sensitive \u00b7 Equity",
       "portfolio_id": 1146853,
       "ytd": 0.102537,
       "prior_day": -0.016298,
@@ -865,7 +865,7 @@
     },
     {
       "name": "Tax Tactical Stock L/S",
-      "group": "Tax Sensitive · Equity",
+      "group": "Tax Sensitive \u00b7 Equity",
       "portfolio_id": 1146860,
       "ytd": 0.062692,
       "prior_day": 0.000197,
@@ -877,25 +877,8 @@
       ]
     },
     {
-      "name": "Tax Regional Stock",
-      "group": "Tax Sensitive · Equity",
-      "portfolio_id": 1146845,
-      "ytd": 0.110841,
-      "prior_day": -0.011798,
-      "holdings": [
-        {
-          "ticker": "VEA",
-          "weight": 0.5
-        },
-        {
-          "ticker": "VWO",
-          "weight": 0.5
-        }
-      ]
-    },
-    {
       "name": "Tax Var Rate Preferred",
-      "group": "Tax Sensitive · Fixed Income",
+      "group": "Tax Sensitive \u00b7 Fixed Income",
       "portfolio_id": 1534983,
       "ytd": 0.013652,
       "prior_day": -0.007433,
@@ -908,7 +891,7 @@
     },
     {
       "name": "Tax Core Bond BOXX",
-      "group": "Tax Sensitive · Fixed Income",
+      "group": "Tax Sensitive \u00b7 Fixed Income",
       "portfolio_id": 1277723,
       "ytd": 0.030147,
       "prior_day": 8.4e-05,
@@ -921,7 +904,7 @@
     },
     {
       "name": "Tax Int-Term Muni 1",
-      "group": "Tax Sensitive · Fixed Income",
+      "group": "Tax Sensitive \u00b7 Fixed Income",
       "portfolio_id": 1277725,
       "ytd": -0.031685,
       "prior_day": -0.002661,

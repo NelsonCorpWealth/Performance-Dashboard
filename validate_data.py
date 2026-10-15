@@ -46,7 +46,6 @@ EXPECTED_SLEEVES = {
     "Tax Core Stock": 1146835,
     "Tax Tactical Stock": 1146853,
     "Tax Tactical Stock L/S": 1146860,
-    "Tax Regional Stock": 1146845,
     "Tax Var Rate Preferred": 1534983,
     "Tax Core Bond BOXX": 1277723,
     "Tax Int-Term Muni 1": 1277725
