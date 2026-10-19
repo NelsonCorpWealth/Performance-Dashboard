@@ -544,7 +544,11 @@ function baseIsStale() {
   if (behind >= 2) return true;
   const et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
   const today = new Date(et.getFullYear(), et.getMonth(), et.getDate()).toISOString().slice(0, 10);
-  return lastCompletedTradingDay() !== today;   // missing session isn't today
+  // One session behind is fine as long as no newer session has opened: the live quote's
+  // move (last close vs prior close) compounds that missing session onto the base. That
+  // covers weekday evenings, weekends and Monday pre-open. It is only stale once a new
+  // session has started and the missing one isn't today.
+  return isTradingDayAfterOpen() && lastCompletedTradingDay() !== today;
 }
 
 function realtimeYTD(base, daily) {
@@ -597,7 +601,7 @@ function renderWeightsWarning() {
 function ytdLabel(mode) {
   const thru = weightsAsOf ? fmtDate(weightsAsOf) : '';
   if (mode === 'live')  return 'YTD <span style="opacity:.6">live</span>';
-  if (mode === 'est')   return 'YTD <span style="opacity:.6">thru today\u2019s close</span>';
+  if (mode === 'est')   return 'YTD <span style="opacity:.6">thru ' + fmtDate(lastCompletedTradingDay()) + ' close</span>';
   if (mode === 'stale') return 'YTD <span style="color:#a07800">base ' + thru + ' \u26a0</span>';
   return 'YTD <span style="opacity:.6">thru ' + thru + '</span>';
 }
