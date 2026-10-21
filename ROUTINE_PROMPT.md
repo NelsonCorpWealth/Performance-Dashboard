@@ -46,6 +46,13 @@ You are updating `data.json` in this repository from YCharts. The file feeds a l
 
 Benchmarks (name / ticker): S&P 500 / SPYM · Dow / DIA · Nasdaq 100 / QQQ · U.S. Bonds / AGG · U.S. Dollar / UUP · Commodities / PDBC
 
+## Handling YCharts data (read before Step 1)
+- Never type, retype or reformat a number from a YCharts tool result. Every value in data.json must come from a script reading a saved copy of the response.
+- After each YCharts call, save the result verbatim to `/tmp/raw/<step>_<n>.json` (copy the exact result text; if the tool already wrote the result to a file, copy that file). Do not summarize, round or reorder it.
+- If a response is too long to save verbatim in one go, re-request it in smaller batches until each batch can be saved.
+- Build data.json only with a script that reads `/tmp/raw/`. Keep `/tmp/raw` out of the repo — commit data.json only.
+- If any value could not be taken from a saved response, do not commit; say which at the top of the summary.
+
 ## Steps
 
 1. Points. Call get_model_portfolio_points with ALL 32 IDs above (strategies + sleeves) and calc_names="ytd_total_return,roc_1". Record the date on the returned points — that is the as-of date. Values are in PERCENT; divide by 100.
