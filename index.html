@@ -441,15 +441,24 @@ async function fetchAllPrices(opts) {
     setStatus('error', 'No quotes'); document.getElementById('update-info').textContent = 'Quote feed returned no prices';
     armTimer(REFRESH_MS); return;
   }
-  etfPrices = {};
-  for (const t of tickers) if (quotes[t] && typeof quotes[t].daily === 'number') etfPrices[t] = { daily: quotes[t].daily, c: quotes[t].c, pc: quotes[t].pc };
+  // A quote only counts if it is as fresh as the feed's as-of date. Mutual
+  // funds price once a day, so during the session their latest point is
+  // yesterday's NAV - using it would mislabel yesterday's move as today's.
+  // Leaving them out makes the card show reduced coverage ("Priced 50%").
+  etfPrices = {}; const stalePriced = [];
+  for (const t of tickers) {
+    const q = quotes[t]; if (!q || typeof q.daily !== 'number') continue;
+    if (payload.isToday && payload.asof && q.asof && q.asof < payload.asof) { stalePriced.push(t); continue; }
+    etfPrices[t] = { daily: q.daily, c: q.c, pc: q.pc };
+  }
+  if (stalePriced.length) console.info('priced only to prior close (not live):', stalePriced.join(', '));
 
   const updated = payload.updated ? new Date(payload.updated) : new Date();
   const stamp = updated.toLocaleTimeString('en-US', { timeStyle: 'short' });
-  const missing = tickers.filter(t => !etfPrices[t]);
+  const missing = tickers.filter(t => !etfPrices[t] && !stalePriced.includes(t));
 
   if (isMarketOpen() && payload.isToday) {
-    setStatus('live', 'Live \u00b7 ' + fetched + '/' + tickers.length + ' tickers');
+    setStatus('live', 'Live \u00b7 ' + Object.keys(etfPrices).length + '/' + tickers.length + ' tickers');
     document.getElementById('update-info').textContent = 'YCharts prices as of ' + stamp;
   } else if (isTradingDayAfterOpen() && payload.isToday) {
     setStatus('loading', "Market closed \u2014 today's close");

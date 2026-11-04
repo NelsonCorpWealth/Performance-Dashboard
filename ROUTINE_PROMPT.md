@@ -19,6 +19,9 @@ You are updating `data.json` in this repository from YCharts. The file feeds a l
 | Tax Aggressive | Tax Sensitive | 1146891 |
 | IA3 High Income | IA3 | 1589463 |
 | IA3 Cash Management | IA3 | 1589508 |
+| Small Account Conservative | Small Account | 1147169 |
+| Small Account Moderate | Small Account | 1147166 |
+| Small Account Aggressive | Small Account | 1147172 |
 
 ## Sleeve portfolios (fixed)
 
@@ -54,13 +57,13 @@ Benchmarks (name / ticker): S&P 500 / SPYM · Dow / DIA · Nasdaq 100 / QQQ · U
 
 ## Steps
 
-1. Points. Call get_model_portfolio_points with ALL 32 IDs above (strategies + sleeves) and calc_names="ytd_total_return,roc_1". Record the date on the returned points — that is the as-of date. Values are in PERCENT; divide by 100.
+1. Points. Call get_model_portfolio_points with ALL 35 IDs above (strategies + sleeves) and calc_names="ytd_total_return,roc_1". Record the date on the returned points — that is the as-of date. Values are in PERCENT; divide by 100.
 
 2. Benchmark YTD. Call get_fund_data with the six benchmark tickers. Take ytd_total_return from each. Percent; divide by 100.
 
-3. Holdings, flattened. Call get_model_portfolio_holdings for all 32 IDs, weight_type="target" (batches of 10). Strategy portfolios hold SLEEVES — nested portfolios whose security_id starts with "P:" — up to three levels deep. Some sleeves also nest. For every P: holding, fetch that portfolio's holdings and multiply weights down the path until only real tickers remain. Cache: many sleeves are shared.
+3. Holdings, flattened. Call get_model_portfolio_holdings for all 35 IDs, weight_type="target" (batches of 10). Strategy portfolios hold SLEEVES — nested portfolios whose security_id starts with "P:" — up to three levels deep. Some sleeves also nest. For every P: holding, fetch that portfolio's holdings and multiply weights down the path until only real tickers remain. Cache: many sleeves are shared.
    - Drop any holding with weight 0.000000 (inactive universe positions).
-   - Map $:CASH, M:FZFXX, M:FDRXX to ticker CASH.
+   - Map $:CASH, M:FZFXX, M:FDRXX to ticker CASH. Other M: ids (mutual funds such as M:FEPIX, M:FSKAX) stay as-is.
    - Weights are percent; divide by 100.
    - Each portfolio must sum to 1.000 ± 0.005. If one doesn't, a sleeve failed to expand — stop and report which.
 

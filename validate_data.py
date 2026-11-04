@@ -27,7 +27,10 @@ EXPECTED_STRATEGIES = {
     "Tax Moderate": 1146880,
     "Tax Aggressive": 1146891,
     "IA3 High Income": 1589463,
-    "IA3 Cash Management": 1589508
+    "IA3 Cash Management": 1589508,
+    "Small Account Conservative": 1147169,
+    "Small Account Moderate": 1147166,
+    "Small Account Aggressive": 1147172
 }
 EXPECTED_SLEEVES = {
     "Core Stock": 548985,
