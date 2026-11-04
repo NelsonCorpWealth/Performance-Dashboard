@@ -312,6 +312,13 @@
 const REFRESH_MS = 120000;          // 2 min
 const MIN_FETCH_GAP_MS = 20000;     // ignore Refresh clicks faster than this
 const WEIGHTS_WARN_DAYS = 4;
+// Mutual funds price once a day, so during the session their daily move is
+// estimated from a liquid ETF that tracks the same exposure. YTD is never
+// proxied - it comes from YCharts with the real NAVs.
+const PROXIES = {
+  'M:FSKAX': 'VTI',   // Fidelity Total Market Index -> Vanguard Total Stock Market (same universe)
+  'M:FEPIX': 'AGG',   // Fidelity Advisor Total Bond (active core-plus) -> Bloomberg Agg ETF
+};
 const WEIGHTS_CANDIDATES = ['data.json'];
 
 let BENCHMARKS = [], strategies = [], sleeves = [];
@@ -365,23 +372,28 @@ function applyWeights(d) {
 function allTickers() {
   const s = new Set();
   BENCHMARKS.forEach(b => b.ticker && s.add(b.ticker));
-  [...strategies, ...sleeves].forEach(m => m.holdings.forEach(h => { if (h.ticker && h.ticker !== 'CASH') s.add(h.ticker); }));
+  [...strategies, ...sleeves].forEach(m => m.holdings.forEach(h => { if (h.ticker && h.ticker !== 'CASH') { s.add(h.ticker); if (PROXIES[h.ticker]) s.add(PROXIES[h.ticker]); } }));
   return [...s];
 }
 
 // { daily, covered }: covered = fraction of weight we could price. Cash = 0%.
+// Returns a holding's live quote, or its proxy's quote when the holding itself
+// only prices at the close. Second value says whether a proxy was used.
+function liveQuoteFor(ticker) {
+  const q = etfPrices[ticker]; if (q) return [q, false];
+  const px = PROXIES[ticker]; if (px && etfPrices[px]) return [etfPrices[px], true];
+  return [null, false];
+}
 function calcDaily(m) {
-  let total = 0, covered = 0, nonCash = 0, priced = 0;
+  let total = 0, covered = 0, proxied = 0, nonCash = 0, priced = 0;
   for (const h of m.holdings) {
     if (h.ticker === 'CASH') { covered += h.weight; continue; }
     nonCash++;
-    const p = etfPrices[h.ticker];
-    if (p) { total += h.weight * p.daily; covered += h.weight; priced++; }
+    const [p, viaProxy] = liveQuoteFor(h.ticker);
+    if (p) { total += h.weight * p.daily; covered += h.weight; priced++; if (viaProxy) proxied += h.weight; }
   }
-  // Nothing but cash could be priced -> we know nothing about today's move.
-  // Return null so cards show a dash and YTD falls back to the base.
-  if (nonCash > 0 && priced === 0) return { daily: null, covered: 0 };
-  return { daily: covered > 0 ? total : null, covered };
+  if (nonCash > 0 && priced === 0) return { daily: null, covered: 0, proxied: 0 };
+  return { daily: covered > 0 ? total : null, covered, proxied };
 }
 
 function armTimer(ms) {
@@ -814,13 +826,13 @@ function renderPortfolioCards(list, containerId, showVsBench, perRow, compact) {
     row.appendChild(label);
 
     g.items.forEach(m => {
-      const { daily, covered } = calcDaily(m);
+      const { daily, covered, proxied } = calcDaily(m);
       const div = document.createElement('div');
       div.className = 'card ' + (daily > 0 ? 'positive' : daily < 0 ? 'negative' : '');
       div.innerHTML = '<div class="card-accent"></div>' +
         '<div class="card-label">' + m.name + '</div>' +
         '<div class="card-value ' + cc(daily) + '">' + fmt(daily) + '</div>' +
-        '<div class="card-type">' + dailyLabel() + '</div>' +
+        '<div class="card-type">' + dailyLabel() + (proxied > 0 ? ' \u00b7 est.' : '') + '</div>' +
         (showVsBench && daily != null && primDaily != null
           ? '<div class="card-divider"></div><div class="card-row"><span>vs ' + pl + '</span><span class="val ' + cc(daily - primDaily) + '">' + fmt(daily - primDaily) + '</span></div>'
           : '') +
@@ -862,10 +874,10 @@ function showHoldings(kind) {
 
   let total = 0, rows = '';
   m.holdings.forEach(h => {
-    const isCash = h.ticker === 'CASH', p = etfPrices[h.ticker];
+    const isCash = h.ticker === 'CASH'; const [p, viaProxy] = isCash ? [null, false] : liveQuoteFor(h.ticker);
     const quoted = isCash || !!p, ret = (!isCash && p) ? p.daily : 0, contrib = h.weight * ret;
     total += contrib;
-    rows += '<tr><td><span class="ticker-tag">' + h.ticker + '</span></td><td>' + (h.weight*100).toFixed(1) + '%</td>' +
+    rows += '<tr><td><span class="ticker-tag">' + h.ticker + '</span>' + (viaProxy ? ' <span style="font-size:.68rem;color:var(--text-light)">est. via ' + PROXIES[h.ticker] + '</span>' : '') + '</td><td>' + (h.weight*100).toFixed(1) + '%</td>' +
       '<td class="' + cc(ret) + '">' + (isCash ? '\u2014' : quoted ? fmt(ret) : '<span style="color:#a07800">no quote</span>') + '</td>' +
       '<td class="' + cc(contrib) + '">' + (isCash || !quoted ? '\u2014' : fmt(contrib)) + '</td></tr>';
   });
