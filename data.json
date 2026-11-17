@@ -1,43 +1,43 @@
 {
-  "ytd_as_of": "2026-11-13",
-  "generated_at": "2026-11-16T12:08:26+00:00",
+  "ytd_as_of": "2026-11-16",
+  "generated_at": "2026-11-17T12:06:36+00:00",
   "source": "YCharts (MCP, cloud routine)",
   "benchmarks": [
     {
       "name": "S&P 500",
       "ticker": "SPYM",
       "dashName": "S&P 500",
-      "ytd": 0.115357
+      "ytd": 0.094375
     },
     {
       "name": "Dow",
       "ticker": "DIA",
       "dashName": "Dow",
-      "ytd": 0.100759
+      "ytd": 0.085042
     },
     {
       "name": "Nasdaq 100",
       "ticker": "QQQ",
       "dashName": "Nasdaq 100",
-      "ytd": 0.110479
+      "ytd": 0.080851
     },
     {
       "name": "U.S. Bonds",
       "ticker": "AGG",
       "dashName": "U.S. Bonds",
-      "ytd": -0.015181
+      "ytd": -0.014559
     },
     {
       "name": "U.S. Dollar",
       "ticker": "UUP",
       "dashName": "U.S. Dollar",
-      "ytd": 0.09138
+      "ytd": 0.0936
     },
     {
       "name": "Commodities",
       "ticker": "PDBC",
       "dashName": "Commodities",
-      "ytd": 0.384151
+      "ytd": 0.36
     }
   ],
   "strategies": [
@@ -45,8 +45,8 @@
       "name": "Conservative",
       "group": "Core",
       "portfolio_id": 597220,
-      "ytd": 0.035581,
-      "prior_day": -0.000443,
+      "ytd": 0.032771,
+      "prior_day": -0.002742,
       "holdings": [
         {
           "ticker": "SGOV",
@@ -86,8 +86,8 @@
       "name": "Moderate",
       "group": "Core",
       "portfolio_id": 552644,
-      "ytd": 0.08307,
-      "prior_day": -0.000539,
+      "ytd": 0.074763,
+      "prior_day": -0.007698,
       "holdings": [
         {
           "ticker": "SGOV",
@@ -147,8 +147,8 @@
       "name": "Aggressive",
       "group": "Core",
       "portfolio_id": 597223,
-      "ytd": 0.111005,
-      "prior_day": -0.00073,
+      "ytd": 0.099262,
+      "prior_day": -0.010583,
       "holdings": [
         {
           "ticker": "VTI",
@@ -204,8 +204,8 @@
       "name": "Absolute Return Conservative",
       "group": "Absolute Return",
       "portfolio_id": 604837,
-      "ytd": 0.032797,
-      "prior_day": -1.6e-05,
+      "ytd": 0.032029,
+      "prior_day": -0.000758,
       "holdings": [
         {
           "ticker": "SGOV",
@@ -245,8 +245,8 @@
       "name": "Absolute Return Moderate",
       "group": "Absolute Return",
       "portfolio_id": 555767,
-      "ytd": 0.077145,
-      "prior_day": -2.9e-05,
+      "ytd": 0.073423,
+      "prior_day": -0.00347,
       "holdings": [
         {
           "ticker": "JPST",
@@ -314,8 +314,8 @@
       "name": "Absolute Return Moderate-Aggressive",
       "group": "Absolute Return",
       "portfolio_id": 604832,
-      "ytd": 0.094338,
-      "prior_day": -0.000165,
+      "ytd": 0.08937,
+      "prior_day": -0.004554,
       "holdings": [
         {
           "ticker": "JPST",
@@ -379,8 +379,8 @@
       "name": "All Tactical",
       "group": "Tactical",
       "portfolio_id": 1297251,
-      "ytd": 0.078167,
-      "prior_day": 0.000337,
+      "ytd": 0.078317,
+      "prior_day": 0.000126,
       "holdings": [
         {
           "ticker": "JPST",
@@ -412,8 +412,8 @@
       "name": "Macro",
       "group": "Tactical",
       "portfolio_id": 1729042,
-      "ytd": 0.177668,
-      "prior_day": 0.001279,
+      "ytd": 0.155721,
+      "prior_day": -0.018636,
       "holdings": [
         {
           "ticker": "GDX",
@@ -445,8 +445,8 @@
       "name": "Tax Conservative",
       "group": "Tax Sensitive",
       "portfolio_id": 1146887,
-      "ytd": 0.047296,
-      "prior_day": -0.002006,
+      "ytd": 0.041112,
+      "prior_day": -0.005905,
       "holdings": [
         {
           "ticker": "BOXX",
@@ -494,8 +494,8 @@
       "name": "Tax Moderate",
       "group": "Tax Sensitive",
       "portfolio_id": 1146880,
-      "ytd": 0.070011,
-      "prior_day": -0.002992,
+      "ytd": 0.059281,
+      "prior_day": -0.010027,
       "holdings": [
         {
           "ticker": "VTI",
@@ -543,8 +543,8 @@
       "name": "Tax Aggressive",
       "group": "Tax Sensitive",
       "portfolio_id": 1146891,
-      "ytd": 0.094968,
-      "prior_day": -0.003453,
+      "ytd": 0.080939,
+      "prior_day": -0.012812,
       "holdings": [
         {
           "ticker": "VTI",
@@ -584,8 +584,8 @@
       "name": "IA3 High Income",
       "group": "IA3",
       "portfolio_id": 1589463,
-      "ytd": 0.02964,
-      "prior_day": 0.000429,
+      "ytd": 0.029819,
+      "prior_day": 0.000159,
       "holdings": [
         {
           "ticker": "GBIL",
@@ -617,8 +617,8 @@
       "name": "IA3 Cash Management",
       "group": "IA3",
       "portfolio_id": 1589508,
-      "ytd": 0.032623,
-      "prior_day": 0.000278,
+      "ytd": 0.032768,
+      "prior_day": 0.000126,
       "holdings": [
         {
           "ticker": "BIL",
@@ -650,8 +650,8 @@
       "name": "Small Account Conservative",
       "group": "Small Account",
       "portfolio_id": 1147169,
-      "ytd": 0.030311,
-      "prior_day": -0.001352,
+      "ytd": 0.029321,
+      "prior_day": -0.001934,
       "holdings": [
         {
           "ticker": "M:FEPIX",
@@ -675,8 +675,8 @@
       "name": "Small Account Moderate",
       "group": "Small Account",
       "portfolio_id": 1147166,
-      "ytd": 0.051369,
-      "prior_day": -0.001413,
+      "ytd": 0.047294,
+      "prior_day": -0.004461,
       "holdings": [
         {
           "ticker": "SHV",
@@ -700,8 +700,8 @@
       "name": "Small Account Aggressive",
       "group": "Small Account",
       "portfolio_id": 1147172,
-      "ytd": 0.071777,
-      "prior_day": -0.001745,
+      "ytd": 0.063375,
+      "prior_day": -0.008056,
       "holdings": [
         {
           "ticker": "SHV",
@@ -727,8 +727,8 @@
       "name": "Core Stock",
       "group": "Standard · Equity",
       "portfolio_id": 548985,
-      "ytd": 0.121517,
-      "prior_day": -0.004052,
+      "ytd": 0.100937,
+      "prior_day": -0.01835,
       "holdings": [
         {
           "ticker": "VTI",
@@ -740,8 +740,8 @@
       "name": "Tactical Stock L/S",
       "group": "Standard · Equity",
       "portfolio_id": 1141466,
-      "ytd": 0.069503,
-      "prior_day": 0.000281,
+      "ytd": 0.069658,
+      "prior_day": 0.000145,
       "holdings": [
         {
           "ticker": "MINT",
@@ -758,7 +758,7 @@
       "group": "Standard · Equity",
       "portfolio_id": 1470892,
       "ytd": 0.08806,
-      "prior_day": 0.0002,
+      "prior_day": 0.0,
       "holdings": [
         {
           "ticker": "GSY",
@@ -770,8 +770,8 @@
       "name": "Regional Stock L/S",
       "group": "Standard · Equity",
       "portfolio_id": 1141467,
-      "ytd": 0.068042,
-      "prior_day": 0.000597,
+      "ytd": 0.068255,
+      "prior_day": 0.000199,
       "holdings": [
         {
           "ticker": "JPST",
@@ -783,8 +783,8 @@
       "name": "Defined Risk",
       "group": "Standard · Equity",
       "portfolio_id": 1145523,
-      "ytd": 0.041504,
-      "prior_day": -0.005267,
+      "ytd": 0.025096,
+      "prior_day": -0.015754,
       "holdings": [
         {
           "ticker": "SFLR",
@@ -796,8 +796,8 @@
       "name": "Big Picture L/S (SPHB/USMV)",
       "group": "Standard · Macro",
       "portfolio_id": 1184181,
-      "ytd": 0.137073,
-      "prior_day": 0.000769,
+      "ytd": 0.128007,
+      "prior_day": -0.007973,
       "holdings": [
         {
           "ticker": "USMV",
@@ -809,8 +809,8 @@
       "name": "Bond Duration L/S (XLK/XLE)",
       "group": "Standard · Macro",
       "portfolio_id": 1271763,
-      "ytd": 0.268167,
-      "prior_day": 0.009793,
+      "ytd": 0.243374,
+      "prior_day": -0.01955,
       "holdings": [
         {
           "ticker": "XLE",
@@ -822,8 +822,8 @@
       "name": "Dollar L/S (AMLP/GDX)",
       "group": "Standard · Macro",
       "portfolio_id": 1195046,
-      "ytd": 0.261219,
-      "prior_day": -0.002443,
+      "ytd": 0.219663,
+      "prior_day": -0.03295,
       "holdings": [
         {
           "ticker": "GDX",
@@ -835,8 +835,8 @@
       "name": "Economic Regime",
       "group": "Standard · Macro",
       "portfolio_id": 1962097,
-      "ytd": 0.184854,
-      "prior_day": -0.004261,
+      "ytd": 0.16712,
+      "prior_day": -0.014967,
       "holdings": [
         {
           "ticker": "SPLV",
@@ -852,8 +852,8 @@
       "name": "Real Estate",
       "group": "Standard · Alternatives & Bonds",
       "portfolio_id": 1145687,
-      "ytd": 0.013568,
-      "prior_day": 0.000142,
+      "ytd": 0.012905,
+      "prior_day": -0.000654,
       "holdings": [
         {
           "ticker": "INDS",
@@ -869,8 +869,8 @@
       "name": "Commodity",
       "group": "Standard · Alternatives & Bonds",
       "portfolio_id": 1146127,
-      "ytd": 0.261983,
-      "prior_day": -0.003802,
+      "ytd": 0.239964,
+      "prior_day": -0.017448,
       "holdings": [
         {
           "ticker": "PDBC",
@@ -882,8 +882,8 @@
       "name": "Dollar",
       "group": "Standard · Alternatives & Bonds",
       "portfolio_id": 1146153,
-      "ytd": -0.013127,
-      "prior_day": -0.000947,
+      "ytd": -0.015466,
+      "prior_day": -0.00237,
       "holdings": [
         {
           "ticker": "BWX",
@@ -895,8 +895,8 @@
       "name": "Core Bond 1",
       "group": "Standard · Alternatives & Bonds",
       "portfolio_id": 548980,
-      "ytd": -0.014099,
-      "prior_day": 0.000299,
+      "ytd": -0.013903,
+      "prior_day": 0.000198,
       "holdings": [
         {
           "ticker": "SGOV",
@@ -908,8 +908,8 @@
       "name": "Tax Core Stock",
       "group": "Tax Sensitive · Equity",
       "portfolio_id": 1146835,
-      "ytd": 0.13342,
-      "prior_day": -0.003361,
+      "ytd": 0.114041,
+      "prior_day": -0.017098,
       "holdings": [
         {
           "ticker": "VTI",
@@ -925,8 +925,8 @@
       "name": "Tax Tactical Stock",
       "group": "Tax Sensitive · Equity",
       "portfolio_id": 1146853,
-      "ytd": 0.048714,
-      "prior_day": -0.009392,
+      "ytd": 0.024815,
+      "prior_day": -0.022789,
       "holdings": [
         {
           "ticker": "PTNQ",
@@ -942,8 +942,8 @@
       "name": "Tax Tactical Stock L/S",
       "group": "Tax Sensitive · Equity",
       "portfolio_id": 1146860,
-      "ytd": 0.068879,
-      "prior_day": 0.0,
+      "ytd": 0.069089,
+      "prior_day": 0.000196,
       "holdings": [
         {
           "ticker": "JMST",
@@ -955,8 +955,8 @@
       "name": "Tax Var Rate Preferred",
       "group": "Tax Sensitive · Fixed Income",
       "portfolio_id": 1534983,
-      "ytd": -0.010189,
-      "prior_day": -0.001687,
+      "ytd": -0.011622,
+      "prior_day": -0.001447,
       "holdings": [
         {
           "ticker": "PFFV",
@@ -968,8 +968,8 @@
       "name": "Tax Core Bond BOXX",
       "group": "Tax Sensitive · Fixed Income",
       "portfolio_id": 1277723,
-      "ytd": 0.034144,
-      "prior_day": 0.000126,
+      "ytd": 0.034404,
+      "prior_day": 0.000252,
       "holdings": [
         {
           "ticker": "BOXX",
@@ -981,8 +981,8 @@
       "name": "Tax Int-Term Muni 1",
       "group": "Tax Sensitive · Fixed Income",
       "portfolio_id": 1277725,
-      "ytd": -0.003911,
-      "prior_day": -0.004317,
+      "ytd": -0.003479,
+      "prior_day": 0.000433,
       "holdings": [
         {
           "ticker": "MMIN",
