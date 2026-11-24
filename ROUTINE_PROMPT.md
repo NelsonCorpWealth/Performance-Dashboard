@@ -34,7 +34,7 @@ You are updating `data.json` in this repository from YCharts. The file feeds a l
 | Defined Risk | Standard · Equity | 1145523 |
 | Big Picture L/S (SPHB/USMV) | Standard · Macro | 1184181 |
 | Bond Duration L/S (XLK/XLE) | Standard · Macro | 1271763 |
-| Dollar L/S (AMLP/GDX) | Standard · Macro | 1195046 |
+| Dollar L/S (IAK/GDX) | Standard · Macro | 1195046 |
 | Economic Regime | Standard · Macro | 1962097 |
 | Real Estate | Standard · Alternatives & Bonds | 1145687 |
 | Commodity | Standard · Alternatives & Bonds | 1146127 |

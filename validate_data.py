@@ -40,7 +40,7 @@ EXPECTED_SLEEVES = {
     "Defined Risk": 1145523,
     "Big Picture L/S (SPHB/USMV)": 1184181,
     "Bond Duration L/S (XLK/XLE)": 1271763,
-    "Dollar L/S (AMLP/GDX)": 1195046,
+    "Dollar L/S (IAK/GDX)": 1195046,
     "Economic Regime": 1962097,
     "Real Estate": 1145687,
     "Commodity": 1146127,
