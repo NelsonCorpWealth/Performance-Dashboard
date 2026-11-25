@@ -1,6 +1,6 @@
 {
   "ytd_as_of": "2026-11-24",
-  "generated_at": "2026-11-25T12:06:35+00:00",
+  "generated_at": "2026-11-25T13:52:49+00:00",
   "source": "YCharts (MCP, cloud routine)",
   "benchmarks": [
     {
@@ -61,15 +61,15 @@
           "weight": 0.108
         },
         {
+          "ticker": "GSY",
+          "weight": 0.084
+        },
+        {
           "ticker": "MINT",
           "weight": 0.084
         },
         {
           "ticker": "SHV",
-          "weight": 0.084
-        },
-        {
-          "ticker": "GSY",
           "weight": 0.084
         },
         {
@@ -118,11 +118,11 @@
           "weight": 0.06
         },
         {
-          "ticker": "USMV",
+          "ticker": "IAK",
           "weight": 0.048125
         },
         {
-          "ticker": "GDX",
+          "ticker": "USMV",
           "weight": 0.048125
         },
         {
@@ -159,6 +159,10 @@
           "weight": 0.126
         },
         {
+          "ticker": "GSY",
+          "weight": 0.098
+        },
+        {
           "ticker": "MINT",
           "weight": 0.098
         },
@@ -167,15 +171,11 @@
           "weight": 0.098
         },
         {
-          "ticker": "GSY",
-          "weight": 0.098
-        },
-        {
-          "ticker": "USMV",
+          "ticker": "IAK",
           "weight": 0.070125
         },
         {
-          "ticker": "GDX",
+          "ticker": "USMV",
           "weight": 0.070125
         },
         {
@@ -232,7 +232,7 @@
           "weight": 0.05
         },
         {
-          "ticker": "BWX",
+          "ticker": "BNDX",
           "weight": 0.04
         },
         {
@@ -277,11 +277,11 @@
           "weight": 0.04
         },
         {
-          "ticker": "USMV",
+          "ticker": "IAK",
           "weight": 0.025
         },
         {
-          "ticker": "GDX",
+          "ticker": "USMV",
           "weight": 0.025
         },
         {
@@ -289,11 +289,11 @@
           "weight": 0.025
         },
         {
-          "ticker": "REZ",
+          "ticker": "INDS",
           "weight": 0.02
         },
         {
-          "ticker": "INDS",
+          "ticker": "REZ",
           "weight": 0.02
         },
         {
@@ -342,11 +342,11 @@
           "weight": 0.05
         },
         {
-          "ticker": "USMV",
+          "ticker": "IAK",
           "weight": 0.026375
         },
         {
-          "ticker": "GDX",
+          "ticker": "USMV",
           "weight": 0.026375
         },
         {
@@ -354,11 +354,11 @@
           "weight": 0.026375
         },
         {
-          "ticker": "REZ",
+          "ticker": "INDS",
           "weight": 0.025
         },
         {
-          "ticker": "INDS",
+          "ticker": "REZ",
           "weight": 0.025
         },
         {
@@ -416,11 +416,11 @@
       "prior_day": -0.001437,
       "holdings": [
         {
-          "ticker": "USMV",
+          "ticker": "IAK",
           "weight": 0.248169
         },
         {
-          "ticker": "GDX",
+          "ticker": "USMV",
           "weight": 0.248169
         },
         {
@@ -588,11 +588,11 @@
       "prior_day": 0.000171,
       "holdings": [
         {
-          "ticker": "ICSH",
+          "ticker": "GBIL",
           "weight": 0.33
         },
         {
-          "ticker": "GBIL",
+          "ticker": "ICSH",
           "weight": 0.33
         },
         {
@@ -826,7 +826,7 @@
       "prior_day": -0.019643,
       "holdings": [
         {
-          "ticker": "GDX",
+          "ticker": "IAK",
           "weight": 1.0
         }
       ]
@@ -856,11 +856,11 @@
       "prior_day": 0.011132,
       "holdings": [
         {
-          "ticker": "REZ",
+          "ticker": "INDS",
           "weight": 0.5
         },
         {
-          "ticker": "INDS",
+          "ticker": "REZ",
           "weight": 0.5
         }
       ]
@@ -886,7 +886,7 @@
       "prior_day": 0.003324,
       "holdings": [
         {
-          "ticker": "BWX",
+          "ticker": "BNDX",
           "weight": 1.0
         }
       ]
